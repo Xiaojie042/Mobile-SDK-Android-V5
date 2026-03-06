@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:scrollbars="none"
+    android:background="#F5F5F5"
+    android:descendantFocusability="afterDescendants">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:descendantFocusability="afterDescendants">
+
+        <!-- PSDK 选择区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_payload_connection_title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp"
+            android:textColor="#333333"/>
+
+        <!-- PSDK 挂载点选择区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/uxsdk_background_rounded_edit_text"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- 第一排 -->
+            <RadioGroup
+                android:id="@+id/rg_psdk_selection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_up"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/uxsdk_payload_psdk_up"
+                    android:textSize="12sp"
+                    android:textColor="#333333"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_left"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/uxsdk_payload_psdk_left"
+                    android:textSize="12sp"
+                    android:textColor="#333333"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/uxsdk_payload_psdk_right"
+                    android:textSize="12sp"
+                    android:textColor="#333333"/>
+            </RadioGroup>
+
+            <!-- 第二排 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_extension_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="扩展点1"
+                    android:textSize="12sp"
+                    android:textColor="#333333"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_extension_2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="扩展点2"
+                    android:textSize="12sp"
+                    android:textColor="#333333"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_extension_3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="扩展点3"
+                    android:textSize="12sp"
+                    android:textColor="#333333"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Payload 信息显示 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_payload_device_info"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textColor="#333333"/>
+
+        <TextView
+            android:id="@+id/tv_payload_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_payload_no_device"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:background="@drawable/uxsdk_background_rounded_edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="#666666"/>
+
+        <!-- 网络设置区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_payload_network_settings"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textColor="#333333"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uxsdk_payload_server_ip"
+                android:textSize="14sp"
+                android:layout_gravity="center_vertical"
+                android:minWidth="80dp"
+                android:textColor="#666666"/>
+
+            <EditText
+                android:id="@+id/et_server_ip"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/uxsdk_background_rounded_edit_text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:hint="192.168.3.31"
+                android:inputType="text"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:textColorHint="#999999"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/uxsdk_payload_server_port"
+                android:textSize="14sp"
+                android:layout_gravity="center_vertical"
+                android:minWidth="80dp"
+                android:textColor="#666666"/>
+
+            <EditText
+                android:id="@+id/et_server_port"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/uxsdk_background_rounded_edit_text"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:hint="8888"
+                android:inputType="number"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:textColorHint="#999999"/>
+        </LinearLayout>
+
+        <!-- 网络连接状态 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/tv_connection_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_payload_network_disconnected"
+                android:textSize="14sp"
+                android:textColor="#666666"/>
+        </LinearLayout>
+
+        <!-- 网络操作按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btn_connect_server"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="@string/uxsdk_payload_connect_server"
+                android:background="@drawable/uxsdk_selector_dialog_button_background"
+                android:textColor="#00AA00"/>
+
+            <Button
+                android:id="@+id/btn_disconnect_server"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="@string/uxsdk_payload_disconnect_server"
+                android:enabled="false"
+                android:background="@drawable/uxsdk_selector_dialog_button_background"
+                android:textColor="#FF4444"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- PSDK 数据显示区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_payload_info_title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:textColor="#333333"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="@drawable/uxsdk_background_rounded_edit_text"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tv_psdk_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/uxsdk_payload_no_data"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:textColor="#666666"/>
+        </ScrollView>
+
+        <!-- 清空按钮 -->
+        <Button
+            android:id="@+id/btn_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/uxsdk_payload_clear_message"
+            android:background="@drawable/uxsdk_selector_dialog_button_background"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+</ScrollView>

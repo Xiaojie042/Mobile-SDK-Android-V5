@@ -75,7 +75,18 @@
             android:id="@+id/action_open_intelligent_box_page"
             app:destination="@id/intelligent_box_page" />
 
+        <action
+            android:id="@+id/action_open_payload_info_network_page"
+            app:destination="@id/payload_info_network_page" />
+
     </fragment>
+
+    <!-- Payload信息网络发送页面 -->
+    <fragment
+        android:id="@+id/payload_info_network_page"
+        android:name="dji.sampleV5.aircraft.pages.PayloadInfoNetworkFragment"
+        android:label="payload_info_network_page"
+        tools:layout="@layout/frag_payload_info_network" />
 
     <fragment
         android:id="@+id/waypoint_v3_page"
@@ -227,4 +238,11 @@
         android:name="dji.sampleV5.aircraft.pages.IntelligentFlightFragment"
         android:label="intelligent_flight_page"
         tools:layout="@layout/frag_intelligent_flight_page"/>
+
+    <!-- USB Data Send -->
+    <fragment
+        android:id="@+id/usb_send_data_page"
+        android:name="dji.sampleV5.aircraft.pages.USBSendDataFragment"
+        android:label="usb_send_data_page"
+        tools:layout="@layout/fragment_usb_send_data"/>
 </navigation>

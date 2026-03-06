@@ -856,6 +856,35 @@
     <string name="uxsdk_setting_menu_title_battery">Aircraft Battery</string>
     <string name="uxsdk_payload_setting_title">Payload Settings</string>
 
+    <!-- Payload Settings -->
+    <string name="uxsdk_payload_connection_title">PSDK Mount Point Selection</string>
+    <string name="uxsdk_payload_connection_status">Connection Status</string>
+    <string name="uxsdk_payload_connected">Connected</string>
+    <string name="uxsdk_payload_disconnected">Disconnected</string>
+    <string name="uxsdk_payload_info_title">PSDK Messages</string>
+    <string name="uxsdk_payload_no_data">No data available</string>
+    <string name="uxsdk_payload_connect">Connect</string>
+    <string name="uxsdk_payload_disconnect">Disconnect</string>
+    <string name="uxsdk_payload_clear_message">Clear Messages</string>
+    <string name="uxsdk_payload_psdk_1">PSDK 1</string>
+    <string name="uxsdk_payload_psdk_2">PSDK 2</string>
+    <string name="uxsdk_payload_psdk_3">PSDK 3</string>
+    <string name="uxsdk_payload_psdk_up">UP Mount Point</string>
+    <string name="uxsdk_payload_psdk_left">LEFT Mount Point</string>
+    <string name="uxsdk_payload_psdk_right">RIGHT Mount Point</string>
+    <string name="uxsdk_payload_psdk_fpv">FPV Mount Point</string>
+    <string name="uxsdk_payload_psdk_center">CENTER Mount Point</string>
+    <string name="uxsdk_payload_device_info">Device Information</string>
+    <string name="uxsdk_payload_no_device">No device connected</string>
+    <string name="uxsdk_payload_network_settings">Network Settings</string>
+    <string name="uxsdk_payload_server_ip">Server IP:</string>
+    <string name="uxsdk_payload_server_port">Port:</string>
+    <string name="uxsdk_payload_connect_server">Connect Server</string>
+    <string name="uxsdk_payload_disconnect_server">Disconnect Server</string>
+    <string name="uxsdk_payload_network_disconnected">Network Status: Disconnected</string>
+    <string name="uxsdk_payload_network_connected">Network Status: Connected</string>
+    <string name="uxsdk_payload_network_connecting">Network Status: Connecting...</string>
+
 
 
     <string name="uxsdk_dialog_loading">Loading...</string>

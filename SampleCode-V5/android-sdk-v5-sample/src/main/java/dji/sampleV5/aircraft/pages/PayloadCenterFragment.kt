@@ -62,5 +62,15 @@ class PayloadCenterFragment : DJIFragment() {
 
             }
         }
+
+        binding?.btOpenPayloadInfoNetworkPage?.setOnClickListener {
+            val values = PayloadIndexType.allValues
+            initPopupNumberPicker(Helper.makeList(values)) {
+                val bundle = Bundle()
+                bundle.putInt(KEY_PAYLOAD_INDEX_TYPE, values[indexChosen[0]].value())
+                Navigation.findNavController(it).navigate(R.id.action_open_payload_info_network_page, bundle)
+
+            }
+        }
     }
 }

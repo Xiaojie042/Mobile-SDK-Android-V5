@@ -19,7 +19,7 @@ More refer to the release notes." </string>
     <string name="release_note_loading">loading…</string>
 
     <string name="app_name_all">MSDK ALL</string>
-    <string name="app_name_aircraft">MSDK Aircraft</string>
+    <string name="app_name_aircraft">DJI_cal</string>
     <string name="app_name_handheld">MSDK Handheld</string>
 
     <string name="item_key_value_title">Key/Value</string>
@@ -494,4 +494,8 @@ More refer to the release notes." </string>
     <string name="item_app_silently_upgrade_description">Demonstrate APP Silently Upgrade functions</string>
     <string name="btn_silently_upgrade_package">Set Silently Upgrade Package</string>
     <string name="btn_install_test_app">Install Test App</string>
+
+    <!-- USB Data Send -->
+    <string name="item_usb_send_data_title">USB Data Send</string>
+    <string name="item_usb_send_data_description">Demonstrate how to send data via USB protocol</string>
 </resources>

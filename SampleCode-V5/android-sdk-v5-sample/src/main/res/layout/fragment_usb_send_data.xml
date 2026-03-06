@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/white">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+    <!-- 连接状态显示 -->
+    <TextView
+        android:id="@+id/tvConnectionStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="USB未连接 - 请通过USB连接PC"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:textStyle="bold" />
+
+    <!-- 数据输入区域 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="数据输入"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+        
+    <EditText
+        android:id="@+id/etData"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:hint="输入要发送的数据"
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_edit_common" />
+    
+    <!-- 发送控制 -->
+    <Button
+        android:id="@+id/btnSendData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加到发送缓冲区"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/selector_enable_button" />
+
+    <!-- 缓冲区状态 -->
+    <TextView
+        android:id="@+id/tvBufferSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="缓冲区大小: 0"
+        android:textColor="@color/blue"
+        android:textSize="14sp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center" />
+
+    <!-- 发送历史记录 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="发送历史"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+        
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginBottom="8dp">
+        
+        <TextView
+            android:id="@+id/tvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="暂无发送记录"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_border_gray"
+            android:padding="8dp" />
+            
+    </ScrollView>
+    
+    <!-- 清空历史记录按钮 -->
+    <Button
+        android:id="@+id/btnClearHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="清空历史记录"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/selector_enable_button"
+        android:textColor="@color/white" />
+
+    <!-- 协议选择（隐藏） -->
+    <Spinner
+        android:id="@+id/spinnerProtocol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>

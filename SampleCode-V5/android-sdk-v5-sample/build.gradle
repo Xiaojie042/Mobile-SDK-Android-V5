@@ -7,7 +7,7 @@ android {
     compileSdkVersion Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
 
     defaultConfig {
-        applicationId "com.dji.sampleV5.aircraft"
+        applicationId "com.dji.ex.calapp"
         minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
         versionCode 1
@@ -130,4 +130,13 @@ dependencies {
     implementation deps.dom
     kapt deps.glidecompiler
     implementation deps.lynx
+
+    // 飞机主包
+    implementation 'com.dji:dji-sdk-v5-aircraft:5.17.0'
+    // 飞机编译包 (仅在编译时需要)
+    compileOnly 'com.dji:dji-sdk-v5-aircraft-provided:5.17.0'
+    // 网络库包 (仅在运行时需要)
+    runtimeOnly 'com.dji:dji-sdk-v5-networkImp:5.17.0'
+
+
 }

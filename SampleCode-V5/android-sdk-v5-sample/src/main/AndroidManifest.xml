@@ -15,6 +15,14 @@
     <!-- 自安装使用 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- USB权限 -->
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
+
+    <!-- 网络权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <!-- Google Maps -->
     <meta-data
         android:name="com.google.android.geo.API_KEY"
@@ -22,7 +30,7 @@
 
     <uses-feature
         android:name="android.hardware.usb.host"
-        android:required="false"/>
+        android:required="true"/>
     <uses-feature
         android:name="android.hardware.usb.accessory"
         android:required="true"/>
@@ -67,6 +75,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <!-- USB设备过滤器 -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/usb_device_filter" />
         </activity>
 
         <activity android:name=".UsbAttachActivity"

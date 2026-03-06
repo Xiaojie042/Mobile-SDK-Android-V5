@@ -848,6 +848,35 @@
     <string name="uxsdk_setting_menu_title_common">通用设置</string>
     <string name="uxsdk_payload_setting_title">Payload 设置</string>
 
+    <!-- Payload Settings -->
+    <string name="uxsdk_payload_connection_title">PSDK 挂载点选择</string>
+    <string name="uxsdk_payload_connection_status">连接状态</string>
+    <string name="uxsdk_payload_connected">已连接</string>
+    <string name="uxsdk_payload_disconnected">未连接</string>
+    <string name="uxsdk_payload_info_title">PSDK 消息</string>
+    <string name="uxsdk_payload_no_data">暂无数据</string>
+    <string name="uxsdk_payload_connect">连接</string>
+    <string name="uxsdk_payload_disconnect">断开</string>
+    <string name="uxsdk_payload_clear_message">清空消息</string>
+    <string name="uxsdk_payload_psdk_1">PSDK 1</string>
+    <string name="uxsdk_payload_psdk_2">PSDK 2</string>
+    <string name="uxsdk_payload_psdk_3">PSDK 3</string>
+    <string name="uxsdk_payload_psdk_up">上方挂载点</string>
+    <string name="uxsdk_payload_psdk_left">左侧挂载点</string>
+    <string name="uxsdk_payload_psdk_right">右侧挂载点</string>
+    <string name="uxsdk_payload_psdk_fpv">FPV 挂载点</string>
+    <string name="uxsdk_payload_psdk_center">中心挂载点</string>
+    <string name="uxsdk_payload_device_info">设备信息</string>
+    <string name="uxsdk_payload_no_device">暂无设备连接</string>
+    <string name="uxsdk_payload_network_settings">网络设置</string>
+    <string name="uxsdk_payload_server_ip">服务器IP:</string>
+    <string name="uxsdk_payload_server_port">端口:</string>
+    <string name="uxsdk_payload_connect_server">连接服务器</string>
+    <string name="uxsdk_payload_disconnect_server">断开服务器</string>
+    <string name="uxsdk_payload_network_disconnected">网络状态: 未连接</string>
+    <string name="uxsdk_payload_network_connected">网络状态: 已连接</string>
+    <string name="uxsdk_payload_network_connecting">网络状态: 连接中...</string>
+
     <string name="uxsdk_dialog_loading">正在加载中...</string>
     <!--MapView-->
     <string name="uxsdk_map_provider_init_failed">地图加载失败，对应地图库未找到</string>

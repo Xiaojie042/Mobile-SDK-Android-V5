@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- USB设备过滤器配置 -->
+    
+    <!-- 通用USB串口设备 (FTDI, CP210x, PL2303等) -->
+    <usb-device vendor-id="0403" /> <!-- FTDI -->
+    <usb-device vendor-id="10c4" /> <!-- Silicon Labs (CP210x) -->
+    <usb-device vendor-id="067b" /> <!-- Prolific (PL2303) -->
+    
+    <!-- Arduino设备 -->
+    <usb-device vendor-id="2341" /> <!-- Arduino LLC -->
+    <usb-device vendor-id="2a03" /> <!-- Arduino.org -->
+    
+    <!-- 常见USB转串口芯片 -->
+    <usb-device vendor-id="1a86" /> <!-- QinHeng Electronics (CH340) -->
+    <usb-device vendor-id="04d8" /> <!-- Microchip Technology -->
+    
+    <!-- 自定义设备 - 根据实际需要添加 -->
+    <!-- <usb-device vendor-id="1234" product-id="5678" /> -->
+    
+    <!-- 通用HID设备 -->
+    <usb-device class="3" subclass="0" protocol="0" />
+    
+    <!-- 通用CDC设备 (通信设备类) -->
+    <usb-device class="2" />
+    
+</resources>
