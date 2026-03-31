@@ -3,144 +3,328 @@ package dji.sampleV5.aircraft.data.source
 import android.content.Context
 import android.hardware.usb.UsbManager
 import android.util.Log
-import dji.sampleV5.aircraft.data.USBProtocol
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.util.concurrent.ConcurrentLinkedQueue
+import dji.sampleV5.aircraft.data.USBBufferedPacket
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.Inet4Address
+import java.net.NetworkInterface
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.URI
+import java.util.Collections
+import java.util.Locale
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 
 class USBDataRepository(private val context: Context) {
-    
+
     companion object {
         private const val TAG = "USBDataRepository"
+        private const val DEFAULT_PORT = 18080
+        private const val MAX_BUFFER_SIZE = 200
+
+        private val packetIdGenerator = AtomicLong(1L)
+        private val packetBuffer = LinkedBlockingQueue<USBBufferedPacket>()
+        private val serverLock = Any()
+
+        @Volatile
+        private var serverSocket: ServerSocket? = null
+
+        @Volatile
+        private var acceptThread: Thread? = null
+
+        @Volatile
+        private var pollingPort: Int = DEFAULT_PORT
     }
-    
+
     private val usbManager: UsbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
-    
-    // 网络客户端 - 备用方案
-    private var networkClient: NetworkClient = NetworkClient("192.168.3.31", 8888)
-    private var currentServerHost = "192.168.3.31"
-    private var currentServerPort = 8888
-    
-    private val dataBuffer = ConcurrentLinkedQueue<ByteArray>()
-    
-    private var isConnected = false
-    
-    // 获取缓冲区大小
-    fun getBufferSize(): Int = dataBuffer.size
-    
-    // 添加数据到缓冲区
-    fun addDataToBuffer(data: ByteArray): Boolean {
-        return try {
-            dataBuffer.offer(data)
-            Log.d(TAG, "数据已添加到缓冲区，当前缓冲区大小: ${dataBuffer.size}")
-            true
-        } catch (e: Exception) {
-            Log.e(TAG, "添加数据到缓冲区失败: ${e.message}")
-            false
+
+    fun startPollingServer(port: Int = DEFAULT_PORT): Result<Int> {
+        synchronized(serverLock) {
+            if (serverSocket?.isClosed == false) {
+                pollingPort = serverSocket?.localPort ?: pollingPort
+                return Result.success(pollingPort)
+            }
+
+            return try {
+                val socket = ServerSocket(port)
+                serverSocket = socket
+                pollingPort = socket.localPort
+                acceptThread = Thread {
+                    acceptLoop(socket)
+                }.apply {
+                    name = "usb-polling-server"
+                    isDaemon = true
+                    start()
+                }
+                Log.i(TAG, "Polling server started on port $pollingPort")
+                Result.success(pollingPort)
+            } catch (error: Exception) {
+                Log.e(TAG, "Failed to start polling server", error)
+                Result.failure(error)
+            }
         }
     }
-    
-    // 获取数据并从缓冲区移除
-    fun getDataFromBuffer(): ByteArray? {
-        return dataBuffer.poll()
+
+    fun stopPollingServer() {
+        synchronized(serverLock) {
+            try {
+                serverSocket?.close()
+            } catch (error: Exception) {
+                Log.w(TAG, "Failed to close polling server", error)
+            } finally {
+                serverSocket = null
+                acceptThread = null
+            }
+        }
     }
-    
-    // 查看数据但不移除
-    fun peekDataFromBuffer(): ByteArray? {
-        return dataBuffer.peek()
+
+    fun isPollingServerRunning(): Boolean {
+        return serverSocket?.isClosed == false
     }
-    
-    // 清空缓冲区
+
+    fun getPollingPort(): Int = pollingPort
+
+    fun getBufferSize(): Int = packetBuffer.size
+
+    fun addTestData(data: String): Result<USBBufferedPacket> {
+        return addPacket("TEST", data.toByteArray(Charsets.UTF_8))
+    }
+
+    fun addPsdkData(data: ByteArray): Result<USBBufferedPacket> {
+        return addPacket("PSDK", data)
+    }
+
     fun clearBuffer() {
-        dataBuffer.clear()
-        Log.d(TAG, "缓冲区已清空")
+        packetBuffer.clear()
+        Log.i(TAG, "Polling buffer cleared")
     }
-    
-    // 检查USB连接状态
+
     fun checkUSBConnection(): Boolean {
         val accessoryList = usbManager.accessoryList
-        isConnected = accessoryList != null && accessoryList.isNotEmpty()
-        Log.d(TAG, "USB连接状态: $isConnected, Accessory数量: ${accessoryList?.size ?: 0}")
-        return isConnected
+        return accessoryList != null && accessoryList.isNotEmpty()
     }
-    
-    // 获取USB连接状态文本
+
     fun getConnectionStatusText(): String {
-        return if (checkUSBConnection()) {
-            "USB已连接 - 等待PC轮询"
+        val accessoryConnected = checkUSBConnection()
+        val serverStatus = if (isPollingServerRunning()) "轮询服务已启动" else "轮询服务未启动"
+        val usbStatus = if (accessoryConnected) {
+            "检测到 Android Accessory 连接"
         } else {
-            "USB未连接 - 请通过USB连接PC"
+            "未检测到 Accessory 直连，当前方案使用 USB 网络轮询"
+        }
+        return "$serverStatus，$usbStatus"
+    }
+
+    fun getPollingHintText(): String {
+        val addresses = getLocalIpv4Addresses()
+        val addressText = if (addresses.isEmpty()) {
+            "请在遥控器开启 USB 网络共享后查看 IP"
+        } else {
+            addresses.joinToString(" / ")
+        }
+        return buildString {
+            append("PC 轮询地址: GET http://<遥控器IP>:")
+            append(getPollingPort())
+            append("/poll?timeoutMs=1000\n")
+            append("状态查询: GET http://<遥控器IP>:")
+            append(getPollingPort())
+            append("/status\n")
+            append("当前可见 IPv4: ")
+            append(addressText)
         }
     }
-    
-    // 发送数据到缓冲区（供ViewModel调用）
-    suspend fun sendData(data: String, protocol: USBProtocol = USBProtocol.BULK): Result<Int> = withContext(Dispatchers.IO) {
-        try {
-            val dataBytes = data.toByteArray(Charsets.UTF_8)
-            val added = addDataToBuffer(dataBytes)
-            
-            if (added) {
-                Log.d(TAG, "数据已添加到缓冲区: ${dataBytes.size} 字节")
-                Result.success(dataBytes.size)
-            } else {
-                Result.failure(Exception("数据添加到缓冲区失败"))
+
+    fun getRecentPackets(limit: Int = 10): List<USBBufferedPacket> {
+        if (limit <= 0) {
+            return emptyList()
+        }
+        return packetBuffer.toList().takeLast(limit).reversed()
+    }
+
+    private fun addPacket(source: String, bytes: ByteArray): Result<USBBufferedPacket> {
+        return try {
+            while (packetBuffer.size >= MAX_BUFFER_SIZE) {
+                packetBuffer.poll()
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "发送数据失败: ${e.message}")
-            Result.failure(e)
+            val packet = USBBufferedPacket.fromBytes(packetIdGenerator.getAndIncrement(), source, bytes)
+            packetBuffer.offer(packet)
+            Log.i(TAG, "Buffered packet source=$source size=${bytes.size} queue=${packetBuffer.size}")
+            Result.success(packet)
+        } catch (error: Exception) {
+            Log.e(TAG, "Failed to buffer packet", error)
+            Result.failure(error)
         }
     }
-    
-    // 获取USB连接状态
-    fun isUSBConnected(): Boolean = isConnected
-    
-    // 断开连接
-    fun disconnect() {
-        isConnected = false
-        clearBuffer()
-        Log.d(TAG, "已断开USB连接")
-    }
-    
-    // 连接到网络服务器（备用方案）
-    fun connectToServer() {
-        try {
-            networkClient.connect()
-            Log.d(TAG, "已连接到网络服务器")
-        } catch (e: Exception) {
-            Log.e(TAG, "连接网络服务器失败: ${e.message}")
-        }
-    }
-    
-    // 断开网络服务器连接（备用方案）
-    fun disconnectFromServer() {
-        try {
-            networkClient.disconnect()
-            Log.d(TAG, "已断开网络服务器连接")
-        } catch (e: Exception) {
-            Log.e(TAG, "断开网络服务器连接失败: ${e.message}")
-        }
-    }
-    
-    // 获取网络连接状态（备用方案）
-    fun getNetworkConnectionStatus(): String {
-        return if (networkClient.isConnected()) {
-            "已连接 - 服务器: ${networkClient.getServerInfo()}"
+
+    private fun pollPacket(timeoutMs: Long): USBBufferedPacket? {
+        return if (timeoutMs > 0) {
+            packetBuffer.poll(timeoutMs, TimeUnit.MILLISECONDS)
         } else {
-            "未连接 - 服务器: ${networkClient.getServerInfo()}"
+            packetBuffer.poll()
         }
     }
-    
-    // 设置服务器地址（备用方案）
-    fun setServerAddress(host: String, port: Int) {
-        currentServerHost = host
-        currentServerPort = port
-        networkClient.setServer(host, port)
-        Log.d(TAG, "已设置服务器地址: $host:$port")
+
+    private fun peekPacket(): USBBufferedPacket? = packetBuffer.peek()
+
+    private fun acceptLoop(socket: ServerSocket) {
+        while (!socket.isClosed) {
+            try {
+                val client = socket.accept()
+                Thread({
+                    handleClient(client)
+                }, "usb-polling-client").apply {
+                    isDaemon = true
+                    start()
+                }
+            } catch (error: Exception) {
+                if (!socket.isClosed) {
+                    Log.e(TAG, "Accept failed", error)
+                }
+            }
+        }
     }
-    
-    // 获取当前服务器主机
-    fun getCurrentServerHost(): String = currentServerHost
-    
-    // 获取当前服务器端口
-    fun getCurrentServerPort(): Int = currentServerPort
+
+    private fun handleClient(client: Socket) {
+        client.use { socket ->
+            try {
+                val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
+                val requestLine = reader.readLine() ?: return
+                while (reader.readLine()?.isNotEmpty() == true) {
+                    // Skip headers.
+                }
+
+                val parts = requestLine.split(" ")
+                if (parts.size < 2) {
+                    writeJson(socket, 400, errorResponse("Invalid request line"))
+                    return
+                }
+
+                val method = parts[0].uppercase(Locale.US)
+                val requestTarget = parts[1]
+                if (method != "GET") {
+                    writeJson(socket, 405, errorResponse("Only GET is supported"))
+                    return
+                }
+
+                val uri = URI(requestTarget)
+                val timeoutMs = uri.getQueryParam("timeoutMs")?.toLongOrNull()?.coerceIn(0L, 5000L) ?: 0L
+                val response = when (uri.path ?: "/") {
+                    "/poll" -> pollResponse(timeoutMs)
+                    "/peek" -> packetResponse(true, peekPacket())
+                    "/status" -> statusResponse()
+                    "/history" -> historyResponse(uri.getQueryParam("limit")?.toIntOrNull() ?: 10)
+                    else -> errorResponse("Unknown path: ${uri.path}")
+                }
+                val statusCode = if (response.optBoolean("success", false)) 200 else 404
+                writeJson(socket, statusCode, response)
+            } catch (error: Exception) {
+                Log.e(TAG, "Client handling failed", error)
+                writeJson(socket, 500, errorResponse(error.message ?: "Internal error"))
+            }
+        }
+    }
+
+    private fun pollResponse(timeoutMs: Long): JSONObject {
+        val packet = pollPacket(timeoutMs)
+        return packetResponse(true, packet)
+    }
+
+    private fun packetResponse(success: Boolean, packet: USBBufferedPacket?): JSONObject {
+        return JSONObject().apply {
+            put("success", success)
+            put("hasData", packet != null)
+            put("queueSize", packetBuffer.size)
+            put("packet", packet?.toJson() ?: JSONObject.NULL)
+        }
+    }
+
+    private fun statusResponse(): JSONObject {
+        return JSONObject().apply {
+            put("success", true)
+            put("queueSize", packetBuffer.size)
+            put("pollingPort", getPollingPort())
+            put("pollingServerRunning", isPollingServerRunning())
+            put("usbAccessoryConnected", checkUSBConnection())
+            put("ipv4Addresses", JSONArray(getLocalIpv4Addresses()))
+            put("message", getConnectionStatusText())
+        }
+    }
+
+    private fun historyResponse(limit: Int): JSONObject {
+        val packets = getRecentPackets(limit.coerceIn(1, 50))
+        return JSONObject().apply {
+            put("success", true)
+            put("queueSize", packetBuffer.size)
+            put("packets", JSONArray().apply {
+                packets.forEach { put(it.toJson()) }
+            })
+        }
+    }
+
+    private fun errorResponse(message: String): JSONObject {
+        return JSONObject().apply {
+            put("success", false)
+            put("message", message)
+        }
+    }
+
+    private fun writeJson(socket: Socket, statusCode: Int, body: JSONObject) {
+        try {
+            val payload = body.toString()
+            val writer = OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8)
+            writer.write("HTTP/1.1 $statusCode ${statusText(statusCode)}\r\n")
+            writer.write("Content-Type: application/json; charset=utf-8\r\n")
+            writer.write("Cache-Control: no-store\r\n")
+            writer.write("Connection: close\r\n")
+            writer.write("Content-Length: ${payload.toByteArray(Charsets.UTF_8).size}\r\n")
+            writer.write("\r\n")
+            writer.write(payload)
+            writer.flush()
+        } catch (error: Exception) {
+            Log.e(TAG, "Failed to write response", error)
+        }
+    }
+
+    private fun statusText(statusCode: Int): String {
+        return when (statusCode) {
+            200 -> "OK"
+            400 -> "Bad Request"
+            404 -> "Not Found"
+            405 -> "Method Not Allowed"
+            else -> "Internal Server Error"
+        }
+    }
+
+    private fun getLocalIpv4Addresses(): List<String> {
+        return try {
+            val interfaces = Collections.list(NetworkInterface.getNetworkInterfaces())
+            interfaces
+                .filter { it.isUp && !it.isLoopback }
+                .flatMap { networkInterface ->
+                    Collections.list(networkInterface.inetAddresses)
+                        .filterIsInstance<Inet4Address>()
+                        .filter { !it.isLoopbackAddress }
+                        .map { "${networkInterface.name}:${it.hostAddress}" }
+                }
+        } catch (error: Exception) {
+            Log.w(TAG, "Failed to enumerate IPv4 addresses", error)
+            emptyList()
+        }
+    }
+
+    private fun URI.getQueryParam(key: String): String? {
+        val query = rawQuery ?: return null
+        return query.split("&")
+            .mapNotNull { item ->
+                val split = item.split("=", limit = 2)
+                if (split.size == 2) split[0] to split[1] else null
+            }
+            .firstOrNull { it.first == key }
+            ?.second
+    }
 }

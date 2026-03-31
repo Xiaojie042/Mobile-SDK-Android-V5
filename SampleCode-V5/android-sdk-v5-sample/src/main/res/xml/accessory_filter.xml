@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+         Placeholder accessory filter.
+         If the PC side implements Android Open Accessory, keep the values in sync.
+    -->
+    <usb-accessory
+        manufacturer="DJI"
+        model="PC Bridge"
+        version="1.0" />
+</resources>

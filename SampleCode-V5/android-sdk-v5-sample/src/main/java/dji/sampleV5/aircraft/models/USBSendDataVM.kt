@@ -5,189 +5,200 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dji.sampleV5.aircraft.data.USBProtocol
+import dji.sampleV5.aircraft.data.USBBufferedPacket
 import dji.sampleV5.aircraft.data.USBConnectionState
 import dji.sampleV5.aircraft.data.source.USBDataRepository
+import dji.v5.manager.aircraft.payload.PayloadCenter
+import dji.v5.manager.aircraft.payload.PayloadIndexType
+import dji.v5.manager.aircraft.payload.listener.PayloadDataListener
 import kotlinx.coroutines.launch
+import java.util.Locale
 
-/**
- * USB数据发送ViewModel - 简化版
- * 安卓设备作为USB从设备，不需要扫描和连接设备
- * 数据存入缓冲区，由PC端主动轮询读取
- * 
- * @author USB开发
- * @date 2024/1/1
- * 
- * Copyright (c) 2024, DJI All Rights Reserved.
- */
 class USBSendDataVM : ViewModel() {
-    
+
+    companion object {
+        private const val TAG = "USBSendDataVM"
+        private const val DEFAULT_PORT = 18080
+    }
+
     private lateinit var usbRepository: USBDataRepository
-    
-    // USB连接状态
-    private val _usbConnectionState = MutableLiveData<USBConnectionState>(USBConnectionState.DISCONNECTED)
+    private val payloadManagerMap = PayloadCenter.getInstance().payloadManager
+    private val registeredPayloadIndices = linkedSetOf<PayloadIndexType>()
+    private val historyList = mutableListOf<String>()
+
+    private val _usbConnectionState = MutableLiveData(USBConnectionState.DISCONNECTED)
     val usbConnectionState: LiveData<USBConnectionState> = _usbConnectionState
-    
-    // 网络连接状态（备用方案）
-    private val _networkConnectionStatus = MutableLiveData<String>("未连接")
-    val networkConnectionStatus: LiveData<String> = _networkConnectionStatus
-    
-    // 缓冲区大小
-    private val _bufferSize = MutableLiveData<Int>(0)
+
+    private val _bufferSize = MutableLiveData(0)
     val bufferSize: LiveData<Int> = _bufferSize
-    
-    // 发送历史记录
+
     private val _sendHistory = MutableLiveData<List<String>>(emptyList())
     val sendHistory: LiveData<List<String>> = _sendHistory
-    
-    // 发送历史记录列表
-    private val historyList = mutableListOf<String>()
-    
-    // 初始化USB数据仓库
-    fun initRepository(repository: USBDataRepository) {
-        usbRepository = repository
-        checkUSBConnection()
-    }
-    
-    // 检查USB连接状态
-    fun checkUSBConnection() {
-        if (::usbRepository.isInitialized) {
-            val isConnected = usbRepository.checkUSBConnection()
-            _usbConnectionState.value = if (isConnected) {
-                USBConnectionState.CONNECTED
-            } else {
-                USBConnectionState.DISCONNECTED
-            }
-            updateBufferSize()
+
+    private val _pollingHint = MutableLiveData("")
+    val pollingHint: LiveData<String> = _pollingHint
+
+    private val _psdkListening = MutableLiveData(false)
+    val psdkListening: LiveData<Boolean> = _psdkListening
+
+    private val _latestPacketPreview = MutableLiveData("暂无缓存数据")
+    val latestPacketPreview: LiveData<String> = _latestPacketPreview
+
+    private val payloadDataListener = PayloadDataListener { data ->
+        if (!::usbRepository.isInitialized) {
+            return@PayloadDataListener
+        }
+        val result = usbRepository.addPsdkData(data)
+        if (result.isSuccess) {
+            val packet = result.getOrNull() ?: return@PayloadDataListener
+            appendHistory(packet, "PSDK 数据进入缓冲区")
+            updateBufferState()
+        } else {
+            Log.e(TAG, "Failed to buffer PSDK data", result.exceptionOrNull())
         }
     }
-    
-    // 获取USB连接状态文本
+
+    fun initRepository(repository: USBDataRepository) {
+        usbRepository = repository
+        val serverResult = usbRepository.startPollingServer(DEFAULT_PORT)
+        if (serverResult.isFailure) {
+            Log.e(TAG, "Failed to start polling server", serverResult.exceptionOrNull())
+            _usbConnectionState.value = USBConnectionState.ERROR
+        }
+        refreshStatus()
+    }
+
+    fun checkUSBConnection() {
+        refreshStatus()
+    }
+
     fun getUSBConnectionStatus(): String {
         return if (::usbRepository.isInitialized) {
             usbRepository.getConnectionStatusText()
         } else {
-            "USB数据仓库未初始化"
+            "USB 缓冲仓库未初始化"
         }
     }
-    
-    // 发送数据 - 将数据添加到缓冲区，等待PC轮询
-    fun sendData(data: String, protocol: USBProtocol = USBProtocol.BULK) {
+
+    fun addTestData(data: String) {
+        if (data.isBlank() || !::usbRepository.isInitialized) {
+            return
+        }
         viewModelScope.launch {
-            try {
-                if (!::usbRepository.isInitialized) {
-                    Log.e("USBSendDataVM", "USB数据仓库未初始化")
-                    return@launch
-                }
-                
-                // 发送数据到USB数据仓库（添加到缓冲区）
-                val result = usbRepository.sendData(data, protocol)
-                
-                if (result.isSuccess) {
-                    val bytesSent = result.getOrNull() ?: 0
-                    
-                    // 添加到发送历史记录
-                    val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
-                    val historyEntry = "[$timestamp] $data (${bytesSent}字节)"
-                    
-                    historyList.add(0, historyEntry) // 添加到开头
-                    if (historyList.size > 10) { // 限制历史记录数量
-                        historyList.removeAt(historyList.size - 1)
-                    }
-                    
-                    _sendHistory.value = historyList.toList()
-                    
-                    Log.d("USBSendDataVM", "数据已添加到缓冲区: $bytesSent 字节")
-                    
-                    // 更新缓冲区大小
-                    updateBufferSize()
-                } else {
-                    val exception = result.exceptionOrNull()
-                    Log.e("USBSendDataVM", "数据添加到缓冲区失败: ${exception?.message}", exception)
-                }
-            } catch (e: Exception) {
-                Log.e("USBSendDataVM", "数据发送异常: ${e.message}", e)
+            val result = usbRepository.addTestData(data)
+            if (result.isSuccess) {
+                val packet = result.getOrNull() ?: return@launch
+                appendHistory(packet, "测试数据进入缓冲区")
+                updateBufferState()
+            } else {
+                Log.e(TAG, "Failed to buffer test data", result.exceptionOrNull())
             }
         }
     }
-    
-    // 连接到网络服务器（备用方案）
-    fun connectToServer() {
-        if (::usbRepository.isInitialized) {
-            try {
-                usbRepository.connectToServer()
-                _networkConnectionStatus.value = usbRepository.getNetworkConnectionStatus()
-            } catch (e: Exception) {
-                Log.e("USBSendDataVM", "连接服务器失败: ${e.message}")
-            }
-        }
-    }
-    
-    // 断开网络服务器连接（备用方案）
-    fun disconnectFromServer() {
-        if (::usbRepository.isInitialized) {
-            try {
-                usbRepository.disconnectFromServer()
-                _networkConnectionStatus.value = usbRepository.getNetworkConnectionStatus()
-            } catch (e: Exception) {
-                Log.e("USBSendDataVM", "断开服务器连接失败: ${e.message}")
-            }
-        }
-    }
-    
-    // 设置服务器地址（备用方案）
-    fun setServerAddress(host: String, port: Int) {
-        if (::usbRepository.isInitialized) {
-            usbRepository.setServerAddress(host, port)
-        }
-    }
-    
-    // 获取当前服务器地址（备用方案）
-    fun getCurrentServerHost(): String {
-        return if (::usbRepository.isInitialized) {
-            usbRepository.getCurrentServerHost()
+
+    fun togglePsdkListening() {
+        if (_psdkListening.value == true) {
+            stopPsdkListening()
         } else {
-            "未知"
+            startPsdkListening()
         }
     }
-    
-    // 获取当前服务器端口（备用方案）
-    fun getCurrentServerPort(): Int {
-        return if (::usbRepository.isInitialized) {
-            usbRepository.getCurrentServerPort()
-        } else {
-            0
-        }
-    }
-    
-    // 断开USB连接
-    fun disconnect() {
-        if (::usbRepository.isInitialized) {
-            usbRepository.disconnect()
-            _usbConnectionState.value = USBConnectionState.DISCONNECTED
-            updateBufferSize()
-        }
-    }
-    
-    // 更新缓冲区大小
-    private fun updateBufferSize() {
-        if (::usbRepository.isInitialized) {
-            _bufferSize.value = usbRepository.getBufferSize()
-        }
-    }
-    
-    // 清空发送历史记录
+
     fun clearHistory() {
         historyList.clear()
         _sendHistory.value = emptyList()
-    }
-    
-    // 检查USB是否连接
-    fun isUSBConnected(): Boolean {
-        return if (::usbRepository.isInitialized) {
-            usbRepository.isUSBConnected()
-        } else {
-            false
+        _latestPacketPreview.value = "暂无缓存数据"
+        if (::usbRepository.isInitialized) {
+            usbRepository.clearBuffer()
+            updateBufferState()
         }
+    }
+
+    private fun startPsdkListening() {
+        if (_psdkListening.value == true) {
+            return
+        }
+
+        registeredPayloadIndices.clear()
+        payloadManagerMap.forEach { (index, manager) ->
+            if (manager != null) {
+                manager.addPayloadDataListener(payloadDataListener)
+                registeredPayloadIndices.add(index)
+            }
+        }
+
+        val indicesText = if (registeredPayloadIndices.isEmpty()) {
+            "未发现可监听的 Payload Manager"
+        } else {
+            registeredPayloadIndices.joinToString { it.name }
+        }
+        addSystemHistory("已开启 PSDK 监听: $indicesText")
+        _psdkListening.value = registeredPayloadIndices.isNotEmpty()
+    }
+
+    private fun stopPsdkListening() {
+        registeredPayloadIndices.forEach { index ->
+            payloadManagerMap[index]?.removePayloadDataListener(payloadDataListener)
+        }
+        registeredPayloadIndices.clear()
+        _psdkListening.value = false
+        addSystemHistory("已停止 PSDK 监听")
+    }
+
+    private fun refreshStatus() {
+        if (!::usbRepository.isInitialized) {
+            return
+        }
+        _usbConnectionState.value = when {
+            usbRepository.isPollingServerRunning() -> USBConnectionState.CONNECTED
+            else -> USBConnectionState.DISCONNECTED
+        }
+        _pollingHint.value = usbRepository.getPollingHintText()
+        updateBufferState()
+    }
+
+    private fun updateBufferState() {
+        if (!::usbRepository.isInitialized) {
+            return
+        }
+        _bufferSize.postValue(usbRepository.getBufferSize())
+        val latestPacket = usbRepository.getRecentPackets(limit = 1).firstOrNull()
+        _latestPacketPreview.postValue(latestPacket?.toPreviewText() ?: "暂无缓存数据")
+    }
+
+    private fun appendHistory(packet: USBBufferedPacket, prefix: String) {
+        val historyEntry = "[${packet.createdAtText()}] $prefix: ${packet.source}, ${packet.byteLength} bytes, ${packet.payloadText.take(80)}"
+        historyList.add(0, historyEntry)
+        if (historyList.size > 20) {
+            historyList.removeAt(historyList.lastIndex)
+        }
+        _sendHistory.postValue(historyList.toList())
+        _latestPacketPreview.postValue(packet.toPreviewText())
+    }
+
+    private fun addSystemHistory(message: String) {
+        val entry = "[SYSTEM] $message"
+        historyList.add(0, entry)
+        if (historyList.size > 20) {
+            historyList.removeAt(historyList.lastIndex)
+        }
+        _sendHistory.value = historyList.toList()
+    }
+
+    private fun USBBufferedPacket.toPreviewText(): String {
+        return String.format(
+            Locale.US,
+            "ID=%d | 来源=%s | 长度=%d bytes | 时间=%s\n文本=%s",
+            id,
+            source,
+            byteLength,
+            createdAtText(),
+            payloadText.take(120)
+        )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopPsdkListening()
     }
 }
