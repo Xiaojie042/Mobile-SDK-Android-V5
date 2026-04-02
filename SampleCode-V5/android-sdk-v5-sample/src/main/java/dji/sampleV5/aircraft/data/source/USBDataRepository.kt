@@ -20,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
-class USBDataRepository(private val context: Context) {
+class USBDataRepository(context: Context) {
 
     companion object {
         private const val TAG = "USBDataRepository"
@@ -41,7 +41,8 @@ class USBDataRepository(private val context: Context) {
         private var pollingPort: Int = DEFAULT_PORT
     }
 
-    private val usbManager: UsbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
+    private val appContext = context.applicationContext
+    private val usbManager: UsbManager = appContext.getSystemService(Context.USB_SERVICE) as UsbManager
 
     fun startPollingServer(port: Int = DEFAULT_PORT): Result<Int> {
         synchronized(serverLock) {
@@ -71,14 +72,28 @@ class USBDataRepository(private val context: Context) {
     }
 
     fun stopPollingServer() {
+        val socketToClose: ServerSocket?
+        val threadToStop: Thread?
         synchronized(serverLock) {
+            socketToClose = serverSocket
+            threadToStop = acceptThread
+            serverSocket = null
+            acceptThread = null
+        }
+
+        try {
+            socketToClose?.close()
+        } catch (error: Exception) {
+            Log.w(TAG, "Failed to close polling server", error)
+        }
+
+        if (threadToStop != null && threadToStop !== Thread.currentThread()) {
             try {
-                serverSocket?.close()
-            } catch (error: Exception) {
-                Log.w(TAG, "Failed to close polling server", error)
-            } finally {
-                serverSocket = null
-                acceptThread = null
+                threadToStop.interrupt()
+                threadToStop.join(500)
+            } catch (error: InterruptedException) {
+                Thread.currentThread().interrupt()
+                Log.w(TAG, "Interrupted while waiting for polling server thread to stop", error)
             }
         }
     }

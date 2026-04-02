@@ -59,6 +59,10 @@ class USBSendDataVM : ViewModel() {
     }
 
     fun initRepository(repository: USBDataRepository) {
+        if (::usbRepository.isInitialized) {
+            refreshStatus()
+            return
+        }
         usbRepository = repository
         val serverResult = usbRepository.startPollingServer(DEFAULT_PORT)
         if (serverResult.isFailure) {
@@ -198,7 +202,10 @@ class USBSendDataVM : ViewModel() {
     }
 
     override fun onCleared() {
-        super.onCleared()
         stopPsdkListening()
+        if (::usbRepository.isInitialized) {
+            usbRepository.stopPollingServer()
+        }
+        super.onCleared()
     }
 }

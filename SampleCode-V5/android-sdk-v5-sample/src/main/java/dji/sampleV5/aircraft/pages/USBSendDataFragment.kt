@@ -28,7 +28,7 @@ class USBSendDataFragment : DJIFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.initRepository(USBDataRepository(requireContext()))
+        viewModel.initRepository(USBDataRepository(requireContext().applicationContext))
         setupUI()
         observeViewModel()
         viewModel.checkUSBConnection()

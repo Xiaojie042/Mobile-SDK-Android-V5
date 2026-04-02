@@ -38,6 +38,8 @@ android {
             signingConfig signingConfigs.release
         }
         debug {
+            debuggable false
+            jniDebuggable false
             minifyEnabled false
             shrinkResources false
             signingConfig signingConfigs.release
