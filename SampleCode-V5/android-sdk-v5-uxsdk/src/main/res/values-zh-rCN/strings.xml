@@ -864,6 +864,7 @@
     <string name="uxsdk_payload_psdk_up">上方挂载点</string>
     <string name="uxsdk_payload_psdk_left">左侧挂载点</string>
     <string name="uxsdk_payload_psdk_right">右侧挂载点</string>
+    <string name="uxsdk_payload_psdk_down">下方挂载点</string>
     <string name="uxsdk_payload_psdk_fpv">FPV 挂载点</string>
     <string name="uxsdk_payload_psdk_center">中心挂载点</string>
     <string name="uxsdk_payload_device_info">设备信息</string>
@@ -1207,6 +1208,25 @@
     <string name="uxsdk_hdmi_system_setting_mode_camera">相机画面</string>
 
     <string name="uxsdk_assistant_video_empty_text">起飞后查看</string>
+    <!-- Flight Data Settings -->
+    <string name="uxsdk_flight_data_setting_title">飞控数据转发</string>
+    <string name="uxsdk_flight_data_frequency">更新频率</string>
+    <string name="uxsdk_flight_data_1hz">1 Hz</string>
+    <string name="uxsdk_flight_data_5hz">5 Hz</string>
+    <string name="uxsdk_flight_data_10hz">10 Hz</string>
+    <string name="uxsdk_flight_data_server_settings">服务器设置</string>
+    <string name="uxsdk_flight_data_server_ip">服务器IP</string>
+    <string name="uxsdk_flight_data_server_port">端口</string>
+    <string name="uxsdk_flight_data_connect">连接服务器</string>
+    <string name="uxsdk_flight_data_disconnect">断开服务器</string>
+    <string name="uxsdk_flight_data_status_disconnected">网络状态: 未连接</string>
+    <string name="uxsdk_flight_data_start_forward">开始转发</string>
+    <string name="uxsdk_flight_data_stop_forward">停止转发</string>
+    <string name="uxsdk_flight_data_preview">飞控数据预览</string>
+    <string name="uxsdk_flight_data_no_data">无数据</string>
+    <string name="uxsdk_flight_data_message_log">消息日志</string>
+    <string name="uxsdk_flight_data_clear">清空</string>
+    <string name="uxsdk_flight_data_no_messages">无消息</string>
 </resources>
 
 

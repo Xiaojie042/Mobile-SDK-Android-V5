@@ -35,7 +35,7 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- 第一排 -->
+            <!-- 第一排：LEFT_OR_MAIN, RIGHT, UP, EXTERNAL -->
             <RadioGroup
                 android:id="@+id/rg_psdk_selection"
                 android:layout_width="match_parent"
@@ -43,22 +43,12 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/rb_psdk_up"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/uxsdk_payload_psdk_up"
-                    android:textSize="12sp"
-                    android:textColor="#333333"
-                    android:checked="true"/>
-
-                <RadioButton
                     android:id="@+id/rb_psdk_left"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/uxsdk_payload_psdk_left"
-                    android:textSize="12sp"
+                    android:text="LEFT_OR_MAIN"
+                    android:textSize="10sp"
                     android:textColor="#333333"/>
 
                 <RadioButton
@@ -66,12 +56,30 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/uxsdk_payload_psdk_right"
-                    android:textSize="12sp"
+                    android:text="RIGHT"
+                    android:textSize="10sp"
+                    android:textColor="#333333"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_up"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="UP"
+                    android:textSize="10sp"
+                    android:textColor="#333333"/>
+                    
+                <RadioButton
+                    android:id="@+id/rb_psdk_external"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="EXTERNAL"
+                    android:textSize="10sp"
                     android:textColor="#333333"/>
             </RadioGroup>
 
-            <!-- 第二排 -->
+            <!-- 第二排：PORT_1, PORT_2, PORT_3, PORT_4 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,31 +87,82 @@
                 android:layout_marginTop="8dp">
 
                 <RadioButton
-                    android:id="@+id/rb_psdk_extension_1"
+                    android:id="@+id/rb_psdk_port1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="扩展点1"
-                    android:textSize="12sp"
+                    android:text="PORT_1"
+                    android:textSize="10sp"
+                    android:textColor="#333333"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_port2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PORT_2"
+                    android:textSize="10sp"
                     android:textColor="#333333"/>
 
                 <RadioButton
-                    android:id="@+id/rb_psdk_extension_2"
+                    android:id="@+id/rb_psdk_port3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="扩展点2"
-                    android:textSize="12sp"
+                    android:text="PORT_3"
+                    android:textSize="10sp"
+                    android:textColor="#333333"/>
+                    
+                <RadioButton
+                    android:id="@+id/rb_psdk_port4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PORT_4"
+                    android:textSize="10sp"
+                    android:textColor="#333333"/>
+            </LinearLayout>
+
+            <!-- 第三排：PORT_5, PORT_6, PORT_7 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_port5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PORT_5"
+                    android:textSize="10sp"
                     android:textColor="#333333"/>
 
                 <RadioButton
-                    android:id="@+id/rb_psdk_extension_3"
+                    android:id="@+id/rb_psdk_port6"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="扩展点3"
-                    android:textSize="12sp"
+                    android:text="PORT_6"
+                    android:textSize="10sp"
                     android:textColor="#333333"/>
+
+                <RadioButton
+                    android:id="@+id/rb_psdk_port7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PORT_7"
+                    android:textSize="10sp"
+                    android:textColor="#333333"/>
+                    
+                <!-- 占位，保持对齐 -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
             </LinearLayout>
         </LinearLayout>
 

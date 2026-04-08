@@ -235,6 +235,9 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
 
         menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_camera_active, R.drawable.uxsdk_ic_setting_camera));
 
+        // 飞控数据转发 - Flight Data Forward (使用HD图标表示数据传输)
+        menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_hd_active, R.drawable.uxsdk_ic_setting_hd));
+
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_RC));
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_HD));
@@ -242,6 +245,8 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_BATTERY));
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_GIMBAL));
+
+        mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_FLIGHT_DATA));
 
         if (isSupportAdvRtk(false)) {
             menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_rtk_active, R.drawable.uxsdk_ic_setting_rtk));

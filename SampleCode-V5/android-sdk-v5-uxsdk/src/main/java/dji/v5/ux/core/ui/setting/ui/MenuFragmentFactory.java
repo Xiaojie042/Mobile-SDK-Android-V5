@@ -3,6 +3,7 @@ package dji.v5.ux.core.ui.setting.ui;
 
 import dji.v5.ux.core.ui.setting.fragment.BatteryMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.CommonMenuFragment;
+import dji.v5.ux.core.ui.setting.fragment.FlightDataFragment;
 import dji.v5.ux.core.ui.setting.fragment.FlycMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.GimbalMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.HDMenuFragment;
@@ -29,6 +30,7 @@ public class MenuFragmentFactory {
     public static final String FRAGMENT_TAG_BATTERY = "BatteryMenuFragment";
     public static final String FRAGMENT_TAG_COMMON = "CommonMenuFragment";
     public static final String FRAGMENT_TAG_PAYLOAD = "PayloadFragment";
+    public static final String FRAGMENT_TAG_FLIGHT_DATA = "FlightDataFragment";
     public static final String FRAGMENT_TAG_SEARCHLIGHT_ACCESSORY = "SearchlightSettingFragment";
     public static final String FRAGMENT_TAG_RTK = "RtkMenuFragment";
 
@@ -49,6 +51,8 @@ public class MenuFragmentFactory {
             return new CommonMenuFragment();
         } else if (FRAGMENT_TAG_PAYLOAD.equals(tag)) {
             return new PayloadFragment();
+        } else if (FRAGMENT_TAG_FLIGHT_DATA.equals(tag)) {
+            return new FlightDataFragment();
         } else if (FRAGMENT_TAG_RTK.equals(tag)) {
             return new RtkMenuFragment();
         } else {

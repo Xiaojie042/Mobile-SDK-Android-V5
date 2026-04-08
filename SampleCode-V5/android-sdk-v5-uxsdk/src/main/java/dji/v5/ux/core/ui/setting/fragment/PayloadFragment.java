@@ -42,12 +42,17 @@ public class PayloadFragment extends MenuFragment {
     private static final String TAG = "PayloadFragment";
     
     private RadioGroup rgPsdkSelection;
-    private RadioButton rbPsdkUp;
     private RadioButton rbPsdkLeft;
     private RadioButton rbPsdkRight;
-    private RadioButton rbPsdkExtension1;
-    private RadioButton rbPsdkExtension2;
-    private RadioButton rbPsdkExtension3;
+    private RadioButton rbPsdkUp;
+    private RadioButton rbPsdkExternal;
+    private RadioButton rbPsdkPort1;
+    private RadioButton rbPsdkPort2;
+    private RadioButton rbPsdkPort3;
+    private RadioButton rbPsdkPort4;
+    private RadioButton rbPsdkPort5;
+    private RadioButton rbPsdkPort6;
+    private RadioButton rbPsdkPort7;
     private TextView tvPayloadInfo;
     private TextView tvConnectionStatus;
     private TextView tvPsdkMessage;
@@ -57,7 +62,7 @@ public class PayloadFragment extends MenuFragment {
     private Button btnDisconnectServer;
     private Button btnClear;
     
-    private PayloadIndexType selectedPayloadIndex = PayloadIndexType.UP;
+    private PayloadIndexType selectedPayloadIndex = PayloadIndexType.PORT_1;
     private StringBuilder messageBuffer = new StringBuilder();
     private StringBuilder psdkDataBuffer = new StringBuilder();
     
@@ -96,12 +101,17 @@ public class PayloadFragment extends MenuFragment {
         }
         
         rgPsdkSelection = view.findViewById(R.id.rg_psdk_selection);
-        rbPsdkUp = view.findViewById(R.id.rb_psdk_up);
         rbPsdkLeft = view.findViewById(R.id.rb_psdk_left);
         rbPsdkRight = view.findViewById(R.id.rb_psdk_right);
-        rbPsdkExtension1 = view.findViewById(R.id.rb_psdk_extension_1);
-        rbPsdkExtension2 = view.findViewById(R.id.rb_psdk_extension_2);
-        rbPsdkExtension3 = view.findViewById(R.id.rb_psdk_extension_3);
+        rbPsdkUp = view.findViewById(R.id.rb_psdk_up);
+        rbPsdkExternal = view.findViewById(R.id.rb_psdk_external);
+        rbPsdkPort1 = view.findViewById(R.id.rb_psdk_port1);
+        rbPsdkPort2 = view.findViewById(R.id.rb_psdk_port2);
+        rbPsdkPort3 = view.findViewById(R.id.rb_psdk_port3);
+        rbPsdkPort4 = view.findViewById(R.id.rb_psdk_port4);
+        rbPsdkPort5 = view.findViewById(R.id.rb_psdk_port5);
+        rbPsdkPort6 = view.findViewById(R.id.rb_psdk_port6);
+        rbPsdkPort7 = view.findViewById(R.id.rb_psdk_port7);
         tvPayloadInfo = view.findViewById(R.id.tv_payload_info);
         tvConnectionStatus = view.findViewById(R.id.tv_connection_status);
         tvPsdkMessage = view.findViewById(R.id.tv_psdk_message);
@@ -184,103 +194,6 @@ public class PayloadFragment extends MenuFragment {
             return;
         }
         
-        // 设置RadioGroup监听器（第一排）
-        rgPsdkSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // 取消第二排的选择
-                if (rbPsdkExtension1 != null) rbPsdkExtension1.setChecked(false);
-                if (rbPsdkExtension2 != null) rbPsdkExtension2.setChecked(false);
-                if (rbPsdkExtension3 != null) rbPsdkExtension3.setChecked(false);
-                
-                PayloadIndexType oldIndex = selectedPayloadIndex;
-                
-                if (checkedId == R.id.rb_psdk_up) {
-                    selectedPayloadIndex = PayloadIndexType.UP;
-                } else if (checkedId == R.id.rb_psdk_left) {
-                    selectedPayloadIndex = PayloadIndexType.LEFT_OR_MAIN;
-                } else if (checkedId == R.id.rb_psdk_right) {
-                    selectedPayloadIndex = PayloadIndexType.RIGHT;
-                }
-                
-                if (oldIndex != selectedPayloadIndex) {
-                    appendMessage("选择 PSDK: " + getPayloadDisplayName(selectedPayloadIndex));
-                    updatePayloadInfo();
-                    reinitPayloadListeners();
-                }
-            }
-        });
-        
-        // 设置第二排RadioButton的点击监听器
-        View.OnClickListener extensionClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 取消RadioGroup中的选择
-                if (rgPsdkSelection != null) {
-                    rgPsdkSelection.clearCheck();
-                }
-                
-                // 取消其他扩展点的选择
-                if (v.getId() != R.id.rb_psdk_extension_1 && rbPsdkExtension1 != null) {
-                    rbPsdkExtension1.setChecked(false);
-                }
-                if (v.getId() != R.id.rb_psdk_extension_2 && rbPsdkExtension2 != null) {
-                    rbPsdkExtension2.setChecked(false);
-                }
-                if (v.getId() != R.id.rb_psdk_extension_3 && rbPsdkExtension3 != null) {
-                    rbPsdkExtension3.setChecked(false);
-                }
-                
-                // 设置当前点击的为选中状态
-                ((RadioButton) v).setChecked(true);
-                
-                PayloadIndexType oldIndex = selectedPayloadIndex;
-                
-                // 根据点击的扩展点设置对应的PayloadIndexType
-                // 需要查看所有可用的PayloadIndexType值来确定扩展点对应的类型
-                PayloadIndexType[] allValues = PayloadIndexType.values();
-                
-                if (v.getId() == R.id.rb_psdk_extension_1) {
-                    // 扩展点1 - 尝试使用索引3的值（如果存在）
-                    if (allValues.length > 3) {
-                        selectedPayloadIndex = allValues[3];
-                    } else {
-                        selectedPayloadIndex = PayloadIndexType.UP;
-                    }
-                    appendMessage("选择 PSDK: 扩展点1 (" + selectedPayloadIndex.name() + ")");
-                } else if (v.getId() == R.id.rb_psdk_extension_2) {
-                    // 扩展点2 - 尝试使用索引4的值（如果存在）
-                    if (allValues.length > 4) {
-                        selectedPayloadIndex = allValues[4];
-                    } else {
-                        selectedPayloadIndex = PayloadIndexType.UP;
-                    }
-                    appendMessage("选择 PSDK: 扩展点2 (" + selectedPayloadIndex.name() + ")");
-                } else if (v.getId() == R.id.rb_psdk_extension_3) {
-                    // 扩展点3 - 尝试使用索引5的值（如果存在）
-                    if (allValues.length > 5) {
-                        selectedPayloadIndex = allValues[5];
-                    } else {
-                        selectedPayloadIndex = PayloadIndexType.UP;
-                    }
-                    appendMessage("选择 PSDK: 扩展点3 (" + selectedPayloadIndex.name() + ")");
-                }
-                
-                // 总是触发更新，即使索引相同
-                updatePayloadInfo();
-                reinitPayloadListeners();
-            }
-        };
-        
-        if (rbPsdkExtension1 != null) rbPsdkExtension1.setOnClickListener(extensionClickListener);
-        if (rbPsdkExtension2 != null) rbPsdkExtension2.setOnClickListener(extensionClickListener);
-        if (rbPsdkExtension3 != null) rbPsdkExtension3.setOnClickListener(extensionClickListener);
-        
-        // 默认选择UP挂载点
-        if (rbPsdkUp != null) {
-            rbPsdkUp.setChecked(true);
-        }
-        
         // 打印所有可用的PayloadIndexType值，用于调试
         PayloadIndexType[] allValues = PayloadIndexType.values();
         StringBuilder debugMsg = new StringBuilder("可用的 PayloadIndexType: ");
@@ -292,20 +205,109 @@ public class PayloadFragment extends MenuFragment {
         }
         LogUtils.d(TAG, debugMsg.toString());
         appendMessage(debugMsg.toString());
+        
+        // 设置RadioGroup监听器（第一排）
+        rgPsdkSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // 取消第二排和第三排的选择
+                clearPortSelections();
+                
+                PayloadIndexType oldIndex = selectedPayloadIndex;
+                
+                if (checkedId == R.id.rb_psdk_left) {
+                    selectedPayloadIndex = PayloadIndexType.LEFT_OR_MAIN;
+                } else if (checkedId == R.id.rb_psdk_right) {
+                    selectedPayloadIndex = PayloadIndexType.RIGHT;
+                } else if (checkedId == R.id.rb_psdk_up) {
+                    selectedPayloadIndex = PayloadIndexType.UP;
+                } else if (checkedId == R.id.rb_psdk_external) {
+                    selectedPayloadIndex = PayloadIndexType.EXTERNAL;
+                }
+                
+                if (oldIndex != selectedPayloadIndex) {
+                    appendMessage("选择 PSDK: " + selectedPayloadIndex.name());
+                    LogUtils.d(TAG, "切换到挂载点: " + selectedPayloadIndex.name());
+                    updatePayloadInfo();
+                    reinitPayloadListeners();
+                }
+            }
+        });
+        
+        // 设置PORT按钮的点击监听器
+        View.OnClickListener portClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 取消RadioGroup中的选择
+                if (rgPsdkSelection != null) {
+                    rgPsdkSelection.clearCheck();
+                }
+                
+                // 取消其他PORT的选择
+                clearPortSelections();
+                
+                // 设置当前点击的为选中状态
+                ((RadioButton) v).setChecked(true);
+                
+                PayloadIndexType oldIndex = selectedPayloadIndex;
+                
+                // 根据点击的PORT设置对应的PayloadIndexType
+                if (v.getId() == R.id.rb_psdk_port1) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_1;
+                } else if (v.getId() == R.id.rb_psdk_port2) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_2;
+                } else if (v.getId() == R.id.rb_psdk_port3) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_3;
+                } else if (v.getId() == R.id.rb_psdk_port4) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_4;
+                } else if (v.getId() == R.id.rb_psdk_port5) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_5;
+                } else if (v.getId() == R.id.rb_psdk_port6) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_6;
+                } else if (v.getId() == R.id.rb_psdk_port7) {
+                    selectedPayloadIndex = PayloadIndexType.PORT_7;
+                }
+                
+                if (oldIndex != selectedPayloadIndex) {
+                    appendMessage("选择 PSDK: " + selectedPayloadIndex.name());
+                    LogUtils.d(TAG, "切换到挂载点: " + selectedPayloadIndex.name());
+                    updatePayloadInfo();
+                    reinitPayloadListeners();
+                }
+            }
+        };
+        
+        // 为所有PORT按钮设置监听器
+        if (rbPsdkPort1 != null) rbPsdkPort1.setOnClickListener(portClickListener);
+        if (rbPsdkPort2 != null) rbPsdkPort2.setOnClickListener(portClickListener);
+        if (rbPsdkPort3 != null) rbPsdkPort3.setOnClickListener(portClickListener);
+        if (rbPsdkPort4 != null) rbPsdkPort4.setOnClickListener(portClickListener);
+        if (rbPsdkPort5 != null) rbPsdkPort5.setOnClickListener(portClickListener);
+        if (rbPsdkPort6 != null) rbPsdkPort6.setOnClickListener(portClickListener);
+        if (rbPsdkPort7 != null) rbPsdkPort7.setOnClickListener(portClickListener);
+        
+        // 默认选择PORT_1挂载点
+        if (rbPsdkPort1 != null) {
+            rbPsdkPort1.setChecked(true);
+        }
+    }
+    
+    private void clearPortSelections() {
+        if (rbPsdkPort1 != null) rbPsdkPort1.setChecked(false);
+        if (rbPsdkPort2 != null) rbPsdkPort2.setChecked(false);
+        if (rbPsdkPort3 != null) rbPsdkPort3.setChecked(false);
+        if (rbPsdkPort4 != null) rbPsdkPort4.setChecked(false);
+        if (rbPsdkPort5 != null) rbPsdkPort5.setChecked(false);
+        if (rbPsdkPort6 != null) rbPsdkPort6.setChecked(false);
+        if (rbPsdkPort7 != null) rbPsdkPort7.setChecked(false);
     }
     
     private String getPayloadDisplayName(PayloadIndexType indexType) {
-        switch (indexType) {
-            case UP:
-                return getString(R.string.uxsdk_payload_psdk_up);
-            case LEFT_OR_MAIN:
-                return getString(R.string.uxsdk_payload_psdk_left);
-            case RIGHT:
-                return getString(R.string.uxsdk_payload_psdk_right);
-            case UNKNOWN:
-            default:
-                return indexType.name() + " 挂载点";
+        if (indexType == null) {
+            return "UNKNOWN";
         }
+        // 直接返回枚举名称
+        return indexType.name();
     }
     
     private void setupButtons() {

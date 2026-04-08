@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_flight_data_setting_title"
+            android:textSize="18sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:paddingBottom="8dp"/>
+
+        <!-- 更新频率选择 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_flight_data_frequency"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_frequency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/rb_1hz"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_1hz"
+                android:textColor="#333333"
+                android:textSize="12sp"/>
+
+            <RadioButton
+                android:id="@+id/rb_5hz"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_5hz"
+                android:textColor="#333333"
+                android:textSize="12sp"/>
+
+            <RadioButton
+                android:id="@+id/rb_10hz"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_10hz"
+                android:textColor="#333333"
+                android:textSize="12sp"/>
+        </RadioGroup>
+
+        <!-- 服务器设置 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_flight_data_server_settings"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <EditText
+                android:id="@+id/et_server_ip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/uxsdk_flight_data_server_ip"
+                android:inputType="text"
+                android:textSize="12sp"
+                android:textColor="#333333"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/et_server_port"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/uxsdk_flight_data_server_port"
+                android:inputType="number"
+                android:textSize="12sp"
+                android:textColor="#333333"
+                android:background="@android:color/white"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- 连接按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_connect_server"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_connect"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="#00AA00"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btn_disconnect_server"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_disconnect"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="#FF4444"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- 网络状态 -->
+        <TextView
+            android:id="@+id/tv_connection_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_flight_data_status_disconnected"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:paddingBottom="8dp"/>
+
+        <!-- 转发控制按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_start_forward"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_start_forward"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="#0088FF"
+                android:layout_marginEnd="8dp"
+                android:enabled="false"/>
+
+            <Button
+                android:id="@+id/btn_stop_forward"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_stop_forward"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:background="#FF8800"
+                android:enabled="false"/>
+        </LinearLayout>
+
+        <!-- 飞控数据预览 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/uxsdk_flight_data_preview"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tv_flight_data_preview"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:text="@string/uxsdk_flight_data_no_data"
+            android:textSize="10sp"
+            android:textColor="#333333"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:fontFamily="monospace"/>
+
+        <!-- 消息日志 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/uxsdk_flight_data_message_log"
+                android:textSize="14sp"
+                android:textColor="#333333"/>
+
+            <Button
+                android:id="@+id/btn_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="@string/uxsdk_flight_data_clear"
+                android:textSize="10sp"
+                android:textColor="@android:color/white"
+                android:background="#888888"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_message_log"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:text="@string/uxsdk_flight_data_no_messages"
+            android:textSize="10sp"
+            android:textColor="#333333"
+            android:background="@android:color/white"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:fontFamily="monospace"/>
+
+    </LinearLayout>
+</ScrollView>
