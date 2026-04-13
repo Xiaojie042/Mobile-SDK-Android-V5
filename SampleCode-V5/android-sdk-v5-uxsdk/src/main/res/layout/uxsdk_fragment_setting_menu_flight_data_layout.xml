@@ -124,7 +124,7 @@
                 android:text="@string/uxsdk_flight_data_connect"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
-                android:background="#00AA00"
+                android:background="@drawable/uxsdk_bg_flight_data_button_gray"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -135,7 +135,7 @@
                 android:text="@string/uxsdk_flight_data_disconnect"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
-                android:background="#FF4444"
+                android:background="@drawable/uxsdk_bg_flight_data_button_gray"
                 android:enabled="false"/>
         </LinearLayout>
 
@@ -164,7 +164,7 @@
                 android:text="@string/uxsdk_flight_data_start_forward"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
-                android:background="#0088FF"
+                android:background="@drawable/uxsdk_bg_flight_data_button_gray"
                 android:layout_marginEnd="8dp"
                 android:enabled="false"/>
 
@@ -176,7 +176,7 @@
                 android:text="@string/uxsdk_flight_data_stop_forward"
                 android:textSize="12sp"
                 android:textColor="@android:color/white"
-                android:background="#FF8800"
+                android:background="@drawable/uxsdk_bg_flight_data_button_gray"
                 android:enabled="false"/>
         </LinearLayout>
 
@@ -225,7 +225,7 @@
                 android:text="@string/uxsdk_flight_data_clear"
                 android:textSize="10sp"
                 android:textColor="@android:color/white"
-                android:background="#888888"
+                android:background="@drawable/uxsdk_bg_flight_data_button_gray"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"/>
         </LinearLayout>

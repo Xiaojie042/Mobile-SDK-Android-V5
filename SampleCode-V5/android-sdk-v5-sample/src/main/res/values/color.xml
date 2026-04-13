@@ -84,6 +84,22 @@
     
     <color name="half_transparent">#80FFFFFF</color>
 
+    <color name="home_entry_button_disabled_bg">#5B5B5B</color>
+    <color name="home_entry_button_disabled_stroke">#888888</color>
+    <color name="home_entry_button_text_disabled">#99FFFFFF</color>
+
+    <color name="home_entry_default_start">#1E78FF</color>
+    <color name="home_entry_default_end">#29C0FF</color>
+    <color name="home_entry_default_pressed">#145CC5</color>
+
+    <color name="home_entry_widget_start">#17A567</color>
+    <color name="home_entry_widget_end">#27CFA0</color>
+    <color name="home_entry_widget_pressed">#0E8151</color>
+
+    <color name="home_entry_tool_start">#D67C14</color>
+    <color name="home_entry_tool_end">#F2A33B</color>
+    <color name="home_entry_tool_pressed">#B36309</color>
+
     <color name="mission_edit_panel_container_bg">#FF111610</color>
     <color name="white_alpha_016">#29FFFFFF</color>
 

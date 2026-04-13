@@ -236,7 +236,7 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_camera_active, R.drawable.uxsdk_ic_setting_camera));
 
         // 飞控数据转发 - Flight Data Forward (使用HD图标表示数据传输)
-        menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_hd_active, R.drawable.uxsdk_ic_setting_hd));
+        menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_flight_data_trans_active, R.drawable.uxsdk_ic_setting_flight_data_trans));
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_RC));
 
