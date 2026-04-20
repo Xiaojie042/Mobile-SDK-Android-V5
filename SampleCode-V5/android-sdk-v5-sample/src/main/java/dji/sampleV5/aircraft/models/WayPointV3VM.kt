@@ -42,6 +42,12 @@ import io.reactivex.rxjava3.disposables.Disposable
  * @description:
  */
 class WayPointV3VM : DJIViewModel() {
+    enum class WayPointMapProvider {
+        AMAP,
+        MAPLIBRE,
+        GOOGLE,
+    }
+
     val RadToDeg = 57.295779513082321
     val missionUploadState = MutableLiveData<MissionUploadStateInfo>()
 
@@ -278,6 +284,28 @@ class WayPointV3VM : DJIViewModel() {
         val resultCode =
             googleApiAvailability.isGooglePlayServicesAvailable(ContextUtil.getContext())
         return resultCode == ConnectionResult.SUCCESS
+    }
+
+    fun resolveMapProvider(context: Context?): WayPointMapProvider {
+        return when (getMapType(context)) {
+            1 -> WayPointMapProvider.AMAP
+            2 -> WayPointMapProvider.MAPLIBRE
+            3 -> if (isGoogleMapsSupported()) {
+                WayPointMapProvider.GOOGLE
+            } else {
+                getAutoMapProvider()
+            }
+
+            else -> getAutoMapProvider()
+        }
+    }
+
+    private fun getAutoMapProvider(): WayPointMapProvider {
+        return when {
+            isInMainlandChina() || isHongKong() || isMacau() -> WayPointMapProvider.AMAP
+            isGoogleMapsSupported() -> WayPointMapProvider.GOOGLE
+            else -> WayPointMapProvider.MAPLIBRE
+        }
     }
 
 }

@@ -97,3 +97,7 @@ android-sdk-v5-ivt/tools/results/
 SampleCode-V5/android-sdk-v5-as/.gradle-user/caches/modules-2/metadata-2.107/descriptors/org.slf4j/slf4j-parent/1.7.30/c9e865a46612337068720573082ec4ab/descriptor.bin
 /SampleCode-V5/android-sdk-v5-as/.gradle-build
 /SampleCode-V5/android-sdk-v5-as/.gradle-user
+/SampleCode-V5/.gradle-home/
+/SampleCode-V5/.android-home/
+/SampleCode-V5/.android/
+/SampleCode-V5/.kotlin-daemon/

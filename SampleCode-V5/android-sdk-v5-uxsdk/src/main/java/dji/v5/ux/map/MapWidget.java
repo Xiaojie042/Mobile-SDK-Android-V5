@@ -74,6 +74,7 @@ import dji.v5.ux.mapkit.core.models.annotations.DJIMarker;
 import dji.v5.ux.mapkit.core.models.annotations.DJIMarkerOptions;
 import dji.v5.ux.mapkit.core.models.annotations.DJIPolyline;
 import dji.v5.ux.mapkit.core.models.annotations.DJIPolylineOptions;
+import dji.v5.ux.mapkit.amap.provider.AMapProvider;
 import dji.v5.ux.mapkit.gmap.provider.GoogleProvider;
 import dji.v5.ux.mapkit.maplibre.provider.MaplibreProvider;
 import io.reactivex.rxjava3.core.Flowable;
@@ -405,6 +406,9 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
         switch (provider) {
             case HERE:
                 // removed
+                break;
+            case AMAP:
+                initAMap(getContext(), null);
                 break;
             case MAPLIBRE:
                 initMapLibreMap(getContext(), null);
@@ -882,12 +886,31 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
      *                 initializing.
      */
     public void initGoogleMap(@Nullable final OnMapReadyListener listener) {
+        clearCurrentMapView();
         mapView = new GoogleProvider().dispatchMapViewRequest(getContext(), null);
-        addView((ViewGroup) mapView, 0);
+        addView((View) mapView, 0);
         mapView.getDJIMapAsync(map -> {
             MapWidget.this.map = map;
             postInit(listener);
             flyZoneHelper.initializeMap(map);
+        });
+    }
+
+    /**
+     * Initializes the MapWidget with AMap.
+     *
+     * @param context  The API access context from AMap.
+     * @param listener The OnMapReadyListener which will invoke the onMapReady method when the map has finished
+     *                 initializing.
+     */
+    public void initAMap(@NonNull Context context, @Nullable final OnMapReadyListener listener) {
+        clearCurrentMapView();
+        mapView = new AMapProvider().dispatchMapViewRequest(context, null);
+        addView((View) mapView, 0);
+        mapView.getDJIMapAsync(map -> {
+            flyZoneHelper.initializeMap(map);
+            this.map = map;
+            postInit(listener);
         });
     }
 
@@ -900,9 +923,10 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
      * @param context  The API access context from Mapbox.
      */
     public void initMapLibreMap(@NonNull Context context, @Nullable final OnMapReadyListener listener) {
+        clearCurrentMapView();
         Mapkit.init(context);
         mapView = new MaplibreProvider().dispatchMapViewRequest(getContext(), null);
-        addView((ViewGroup) mapView, 0);
+        addView((View) mapView, 0);
         mapView.getDJIMapAsync(map -> {
             flyZoneHelper.initializeMap(map);
             this.map = map;
@@ -915,6 +939,27 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
                 }
             });
         });
+    }
+
+    private void clearCurrentMapView() {
+        map = null;
+        homeMarker = null;
+        gimbalYawMarker = null;
+        aircraftMarker = null;
+        homeLine = null;
+        flightPathLine = null;
+        if (mapView == null) {
+            return;
+        }
+        try {
+            mapView.onDestroy();
+        } catch (Exception e) {
+            LogUtils.e(TAG, "Error while clearing previous map view: " + e);
+        }
+        if (mapView instanceof View) {
+            removeView((View) mapView);
+        }
+        mapView = null;
     }
 
     /**

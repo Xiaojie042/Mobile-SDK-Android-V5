@@ -178,12 +178,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         secondaryFPVWidget.setSurfaceViewZOrderMediaOverlay(true);
 
 
-        mapWidget.initMapLibreMap(getApplicationContext(), map -> {
-            DJIUiSettings uiSetting = map.getUiSettings();
-            if (uiSetting != null) {
-                uiSetting.setZoomControlsEnabled(false);//hide zoom widget
-            }
-        });
+        initDefaultMapWidget();
         mapWidget.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
 
@@ -230,6 +225,17 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
     private void toggleRightDrawer() {
         mDrawerLayout.openDrawer(GravityCompat.END);
+    }
+
+    private void initDefaultMapWidget() {
+        MapWidget.OnMapReadyListener listener = map -> {
+            DJIUiSettings uiSetting = map.getUiSettings();
+            if (uiSetting != null) {
+                uiSetting.setZoomControlsEnabled(false);//hide zoom widget
+            }
+        };
+        LogUtils.i(TAG, "init default map provider=AMAP");
+        mapWidget.initAMap(this, listener);
     }
 
 

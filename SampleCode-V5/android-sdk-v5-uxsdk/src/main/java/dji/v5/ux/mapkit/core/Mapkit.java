@@ -34,12 +34,13 @@ public class Mapkit {
     private static int sGeocodingProvider = MapProviderConstant.INVALID_PROVIDER;
 
     private static final HashMap<Integer, String> providerClassName = new HashMap<>();
+    private static final String CLASS_PROVIDER_AMAP = "dji.v5.ux.mapkit.amap.provider.AMapProvider";
     private static final String CLASS_PROVIDER_MAPLIBRE = "dji.v5.ux.mapkit.maplibre.provider.MaplibreProvider";
-    private static final String CLASS_PROVIDER_GOOGLE = "com.dji.mapkit.google.provider.GoogleProvider";
-   // private static final String CLASS_PROVIDER_MAPLIBRE = "dji.v5.ux.mapkit.maplibre.provider.MapLibreProvider";
+    private static final String CLASS_PROVIDER_GOOGLE = "dji.v5.ux.mapkit.gmap.provider.GoogleProvider";
 
     static {
         providerClassName.put(MapProviderConstant.GOOGLE_MAP_PROVIDER, CLASS_PROVIDER_GOOGLE);
+        providerClassName.put(MapProviderConstant.AMAP_MAP_PROVIDER, CLASS_PROVIDER_AMAP);
         providerClassName.put(MapProviderConstant.MAPLIBRE_MAP_PROVIDER, CLASS_PROVIDER_MAPLIBRE);
     }
 
@@ -58,11 +59,12 @@ public class Mapkit {
      * 地图Provider类型
      */
     @IntDef({MapProviderConstant.INVALID_PROVIDER, MapProviderConstant.GOOGLE_MAP_PROVIDER,
-     MapProviderConstant.MAPLIBRE_MAP_PROVIDER, MapProviderConstant.HERE_MAP_PROVIDER})
+     MapProviderConstant.AMAP_MAP_PROVIDER, MapProviderConstant.MAPLIBRE_MAP_PROVIDER,
+     MapProviderConstant.HERE_MAP_PROVIDER})
     public @interface MapProviderConstant {
         int INVALID_PROVIDER = 0;
         int GOOGLE_MAP_PROVIDER = 1;
-
+        int AMAP_MAP_PROVIDER = 2;
         int MAPLIBRE_MAP_PROVIDER = 3;
         int HERE_MAP_PROVIDER = 4;
     }

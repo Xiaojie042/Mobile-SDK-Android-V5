@@ -55,6 +55,7 @@ dependencies {
     implementation deps.mikepenzIonicons
     implementation deps.material
 
+    api deps.amap3dMap
     api deps.maplibreTurf
     api deps.maplibreSdk
 

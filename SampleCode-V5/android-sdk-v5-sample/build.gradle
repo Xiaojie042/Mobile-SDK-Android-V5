@@ -13,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         manifestPlaceholders["API_KEY"] = project.AIRCRAFT_API_KEY
+        manifestPlaceholders["AMAP_API_KEY"] = project.AMAP_API_KEY
         manifestPlaceholders["GMAP_API_KEY"] = project.GMAP_API_KEY
         manifestPlaceholders["MAPLIBRE_TOKEN"] = project.MAPLIBRE_TOKEN
         ndk {

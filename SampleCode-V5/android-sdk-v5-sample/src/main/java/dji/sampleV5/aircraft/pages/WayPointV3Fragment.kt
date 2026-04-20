@@ -20,6 +20,7 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
@@ -129,6 +130,8 @@ class WayPointV3Fragment : DJIFragment() {
     var validLenth: Int = 2
     var curMissionExecuteState: WaypointMissionExecuteState? = null
     var selectWaylines: ArrayList<Int> = ArrayList()
+    private var hasMapSelectionInitialized = false
+    private var currentMapProvider: WayPointV3VM.WayPointMapProvider? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -270,7 +273,27 @@ class WayPointV3Fragment : DJIFragment() {
             binding?.mapWidget?.setMapCenterLock(MapWidget.MapCenterLock.AIRCRAFT)
         }
 
-        binding?.spMapSwitch?.setSelection(wayPointV3VM.getMapType(context))
+        binding?.spMapSwitch?.setSelection(wayPointV3VM.getMapType(context), false)
+        currentMapProvider = wayPointV3VM.resolveMapProvider(context)
+        binding?.spMapSwitch?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                wayPointV3VM.saveMapType(context, position)
+                val nextProvider = wayPointV3VM.resolveMapProvider(context)
+                if (!hasMapSelectionInitialized) {
+                    hasMapSelectionInitialized = true
+                    currentMapProvider = nextProvider
+                    return
+                }
+                if (nextProvider != currentMapProvider) {
+                    currentMapProvider = nextProvider
+                    createMapView(null)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // no-op
+            }
+        }
 
         binding?.btnMissionStop?.setOnClickListener {
             if (curMissionExecuteState == WaypointMissionExecuteState.READY) {
@@ -728,10 +751,39 @@ class WayPointV3Fragment : DJIFragment() {
     }
 
     private fun createMapView(savedInstanceState: Bundle?) {
-        binding?.mapWidget?.initMapLibreMap(requireContext()) {
-            it.setMapType(DJIMap.MapType.NORMAL)
+        when (wayPointV3VM.resolveMapProvider(context)) {
+            WayPointV3VM.WayPointMapProvider.AMAP -> binding?.mapWidget?.initAMap(requireContext()) {
+                it.setMapType(DJIMap.MapType.NORMAL)
+                restoreMapOverlays()
+            }
+
+            WayPointV3VM.WayPointMapProvider.GOOGLE -> binding?.mapWidget?.initGoogleMap {
+                it.setMapType(DJIMap.MapType.NORMAL)
+                restoreMapOverlays()
+            }
+
+            WayPointV3VM.WayPointMapProvider.MAPLIBRE -> binding?.mapWidget?.initMapLibreMap(requireContext()) {
+                it.setMapType(DJIMap.MapType.NORMAL)
+                restoreMapOverlays()
+            }
         }
-        binding?.mapWidget?.onCreate(savedInstanceState) //需要再init后调用否则Amap无法显示
+        binding?.mapWidget?.onCreate(savedInstanceState)
+    }
+
+    private fun restoreMapOverlays() {
+        pointMarkers.clear()
+        if (showWaypoints.isNotEmpty()) {
+            showWaypoints.forEachIndexed { index, waypointInfoModel ->
+                val location = waypointInfoModel.waylineWaypoint.location
+                pointMarkers.add(markWaypoint(DJILatLng(location.latitude, location.longitude), index + 1))
+            }
+        } else if (curMissionPath.isNotEmpty() && File(curMissionPath).exists()) {
+            markWaypoints()
+        }
+
+        if (interestPoint.latitude != 0.0 || interestPoint.longitude != 0.0) {
+            pointMarkers.add(markPoiWaypoint(DJILatLng(interestPoint.latitude, interestPoint.longitude)))
+        }
     }
 
     override fun onPause() {

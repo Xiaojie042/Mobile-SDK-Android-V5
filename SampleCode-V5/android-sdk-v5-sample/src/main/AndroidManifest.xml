@@ -23,11 +23,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <!-- Google Maps -->
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="${GMAP_API_KEY}" />
-
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="true"/>
@@ -48,6 +43,14 @@
         <meta-data
             android:name="com.dji.sdk.API_KEY"
             android:value="${API_KEY}"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${GMAP_API_KEY}" />
+
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="${AMAP_API_KEY}" />
 
         <!-- Maplibre Token-->
         <meta-data
