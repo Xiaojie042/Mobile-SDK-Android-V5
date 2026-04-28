@@ -38,6 +38,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import dji.sdk.keyvalue.value.common.CameraLensType;
@@ -91,6 +92,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
     //region Fields
     private final String TAG = LogUtils.getTag(this);
+    private static final int MINI_WIDGET_MARGIN_DP = 12;
 
     protected FPVWidget primaryFpvWidget;
     protected FPVInteractionWidget fpvInteractionWidget;
@@ -110,12 +112,16 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     protected SettingWidget settingWidget;
     protected MapWidget mapWidget;
     protected TopBarPanelWidget topBarPanel;
+    protected ConstraintLayout defaultLayoutRoot;
     protected ConstraintLayout fpvParentView;
     private DrawerLayout mDrawerLayout;
+    private View mapSwapHotspot;
     private TextView gimbalAdjustDone;
     private GimbalFineTuneWidget gimbalFineTuneWidget;
     private ComponentIndexType lastDevicePosition = ComponentIndexType.UNKNOWN;
     private CameraLensType lastLensType = CameraLensType.UNKNOWN;
+    private final List<ComponentIndexType> latestAvailableCameraList = new ArrayList<>();
+    private boolean isMapExpanded = false;
 
 
     private CompositeDisposable compositeDisposable;
@@ -130,7 +136,12 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     private final ICameraStreamManager.AvailableCameraUpdatedListener availableCameraUpdatedListener = new ICameraStreamManager.AvailableCameraUpdatedListener() {
         @Override
         public void onAvailableCameraUpdated(@NonNull List<ComponentIndexType> availableCameraList) {
-            runOnUiThread(() -> updateFPVWidgetSource(availableCameraList));
+            List<ComponentIndexType> updatedList = new ArrayList<>(availableCameraList);
+            runOnUiThread(() -> {
+                latestAvailableCameraList.clear();
+                latestAvailableCameraList.addAll(updatedList);
+                updateFPVWidgetSource(updatedList);
+            });
         }
 
         @Override
@@ -146,6 +157,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.uxsdk_activity_default_layout);
+        defaultLayoutRoot = findViewById(R.id.default_layout_root);
         fpvParentView = findViewById(R.id.fpv_holder);
         mDrawerLayout = findViewById(R.id.root_view);
         topBarPanel = findViewById(R.id.panel_top_bar);
@@ -168,6 +180,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         gimbalAdjustDone = findViewById(R.id.fpv_gimbal_ok_btn);
         gimbalFineTuneWidget = findViewById(R.id.setting_menu_gimbal_fine_tune);
         mapWidget = findViewById(R.id.widget_map);
+        mapSwapHotspot = findViewById(R.id.view_map_swap_hotspot);
 
         initClickListener();
         MediaDataCenter.getInstance().getCameraStreamManager().addAvailableCameraUpdatedListener(availableCameraUpdatedListener);
@@ -199,6 +212,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
     private void initClickListener() {
         secondaryFPVWidget.setOnClickListener(v -> swapVideoSource());
+        mapSwapHotspot.setOnClickListener(v -> toggleMapSize());
 
         if (settingWidget != null) {
             settingWidget.setOnClickListener(v -> toggleRightDrawer());
@@ -236,6 +250,115 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         };
         LogUtils.i(TAG, "init default map provider=AMAP");
         mapWidget.initAMap(this, listener);
+    }
+
+    private void toggleMapSize() {
+        isMapExpanded = !isMapExpanded;
+        updateMapLayoutState();
+    }
+
+    private void updateMapLayoutState() {
+        int miniWidth = getResources().getDimensionPixelSize(R.dimen.uxsdk_150_dp);
+        int miniHeight = getResources().getDimensionPixelSize(R.dimen.uxsdk_100_dp);
+        int miniMargin = (int) (MINI_WIDGET_MARGIN_DP * getResources().getDisplayMetrics().density);
+
+        LayoutParams mapLayoutParams = (LayoutParams) mapWidget.getLayoutParams();
+        LayoutParams fpvLayoutParams = (LayoutParams) fpvParentView.getLayoutParams();
+        LayoutParams hotspotLayoutParams = (LayoutParams) mapSwapHotspot.getLayoutParams();
+
+        if (isMapExpanded) {
+            applyFullScreenConstraints(mapLayoutParams);
+            applyMiniPreviewConstraints(fpvLayoutParams, miniWidth, miniHeight, miniMargin);
+            applyMiniPreviewConstraints(hotspotLayoutParams, miniWidth, miniHeight, miniMargin);
+            secondaryFPVWidget.setVisibility(View.GONE);
+            fpvParentView.bringToFront();
+        } else {
+            applyMiniPreviewConstraints(mapLayoutParams, miniWidth, miniHeight, miniMargin);
+            applyFullScreenConstraints(fpvLayoutParams);
+            applyMiniPreviewConstraints(hotspotLayoutParams, miniWidth, miniHeight, miniMargin);
+            restoreSecondaryFpvState();
+        }
+
+        mapWidget.setLayoutParams(mapLayoutParams);
+        fpvParentView.setLayoutParams(fpvLayoutParams);
+        mapSwapHotspot.setLayoutParams(hotspotLayoutParams);
+        updateLayoutZOrder();
+        defaultLayoutRoot.requestLayout();
+    }
+
+    private void applyFullScreenConstraints(LayoutParams layoutParams) {
+        layoutParams.width = 0;
+        layoutParams.height = 0;
+        layoutParams.topToTop = LayoutParams.UNSET;
+        layoutParams.bottomToTop = LayoutParams.UNSET;
+        layoutParams.startToEnd = LayoutParams.UNSET;
+        layoutParams.endToStart = LayoutParams.UNSET;
+        layoutParams.topToBottom = R.id.panel_top_bar;
+        layoutParams.bottomToBottom = LayoutParams.PARENT_ID;
+        layoutParams.startToStart = LayoutParams.PARENT_ID;
+        layoutParams.endToEnd = LayoutParams.PARENT_ID;
+        layoutParams.setMargins(0, 0, 0, 0);
+    }
+
+    private void applyMiniPreviewConstraints(LayoutParams layoutParams, int width, int height, int margin) {
+        layoutParams.width = width;
+        layoutParams.height = height;
+        layoutParams.topToTop = LayoutParams.UNSET;
+        layoutParams.topToBottom = LayoutParams.UNSET;
+        layoutParams.bottomToTop = LayoutParams.UNSET;
+        layoutParams.startToStart = LayoutParams.UNSET;
+        layoutParams.startToEnd = LayoutParams.UNSET;
+        layoutParams.endToStart = LayoutParams.UNSET;
+        layoutParams.bottomToBottom = LayoutParams.PARENT_ID;
+        layoutParams.endToEnd = LayoutParams.PARENT_ID;
+        layoutParams.setMargins(0, 0, margin, margin);
+    }
+
+    private void restoreSecondaryFpvState() {
+        if (latestAvailableCameraList.isEmpty()) {
+            secondaryFPVWidget.setVisibility(View.GONE);
+            return;
+        }
+        updateFPVWidgetSource(new ArrayList<>(latestAvailableCameraList));
+    }
+
+    private void updateLayoutZOrder() {
+        View remainingFlightTimeWidget = findViewById(R.id.widget_remaining_flight_time);
+        View takeOffWidget = findViewById(R.id.widget_take_off);
+        View returnHomeWidget = findViewById(R.id.widget_return_to_home);
+
+        View[] overlayViews = {
+                topBarPanel,
+                remainingFlightTimeWidget,
+                horizontalSituationIndicatorWidget,
+                gimbalFineTuneWidget,
+                ndviCameraPanel,
+                visualCameraPanel,
+                autoExposureLockWidget,
+                focusModeWidget,
+                focusExposureSwitchWidget,
+                cameraControlsWidget,
+                focalZoomWidget,
+                takeOffWidget,
+                lensControlWidget,
+                returnHomeWidget,
+                simulatorControlWidget,
+                pfvFlightDisplayWidget,
+                systemStatusListPanelWidget
+        };
+
+        for (View overlayView : overlayViews) {
+            if (overlayView != null) {
+                overlayView.bringToFront();
+            }
+        }
+
+        if (isMapExpanded) {
+            fpvParentView.bringToFront();
+        } else {
+            mapWidget.bringToFront();
+        }
+        mapSwapHotspot.bringToFront();
     }
 
 
@@ -335,7 +458,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         ComponentIndexType secondarySource = getSuitableSource(cameraList, ComponentIndexType.FPV);
         secondaryFPVWidget.updateVideoSource(secondarySource);
 
-        secondaryFPVWidget.setVisibility(View.VISIBLE);
+        secondaryFPVWidget.setVisibility(isMapExpanded ? View.GONE : View.VISIBLE);
     }
 
     private ComponentIndexType getSuitableSource(List<ComponentIndexType> cameraList, ComponentIndexType defaultSource) {
@@ -449,7 +572,9 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.END)) {
+        if (isMapExpanded) {
+            toggleMapSize();
+        } else if (mDrawerLayout.isDrawerOpen(GravityCompat.END)) {
             mDrawerLayout.closeDrawers();
         } else {
             super.onBackPressed();

@@ -30,6 +30,7 @@
     tools:context="dji.v5.ux.sample.showcase.defaultlayout.DefaultLayoutActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/default_layout_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -273,6 +274,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:uxsdk_djiMap_mapType="normal" />
+
+        <View
+            android:id="@+id/view_map_swap_hotspot"
+            android:layout_width="@dimen/uxsdk_150_dp"
+            android:layout_height="@dimen/uxsdk_100_dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/uxsdk_provider_amap"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <dji.v5.ux.core.panel.systemstatus.SystemStatusListPanelWidget
             android:id="@+id/widget_panel_system_status_list"
