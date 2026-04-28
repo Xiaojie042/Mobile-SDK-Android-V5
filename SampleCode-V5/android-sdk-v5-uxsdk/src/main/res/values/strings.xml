@@ -1247,5 +1247,37 @@
     <string name="uxsdk_flight_data_clear">Clear</string>
     <string name="uxsdk_flight_data_no_messages">No messages</string>
 
+    <!-- MQTT Settings -->
+    <string name="uxsdk_mqtt_setting_title">MQTT Data Forward</string>
+    <string name="uxsdk_mqtt_broker_settings">MQTT Broker Settings</string>
+    <string name="uxsdk_mqtt_broker_host">Server IP/Domain</string>
+    <string name="uxsdk_mqtt_broker_port">Port</string>
+    <string name="uxsdk_mqtt_client_id">Client ID</string>
+    <string name="uxsdk_mqtt_username">Username (Optional)</string>
+    <string name="uxsdk_mqtt_password">Password (Optional)</string>
+    <string name="uxsdk_mqtt_topic_settings">Topic Settings</string>
+    <string name="uxsdk_mqtt_flight_topic">Flight Data Topic</string>
+    <string name="uxsdk_mqtt_psdk_topic">PSDK Data Topic</string>
+    <string name="uxsdk_mqtt_data_source">Data Source</string>
+    <string name="uxsdk_mqtt_enable_flight_data">Upload Flight Data</string>
+    <string name="uxsdk_mqtt_enable_psdk_data">Upload PSDK Data</string>
+    <string name="uxsdk_mqtt_frequency">Flight Data Publish Frequency</string>
+    <string name="uxsdk_mqtt_1hz">1 Hz</string>
+    <string name="uxsdk_mqtt_5hz">5 Hz</string>
+    <string name="uxsdk_mqtt_10hz">10 Hz</string>
+    <string name="uxsdk_mqtt_connect">Connect MQTT</string>
+    <string name="uxsdk_mqtt_disconnect">Disconnect MQTT</string>
+    <string name="uxsdk_mqtt_status_disconnected">MQTT Status: Disconnected</string>
+    <string name="uxsdk_mqtt_start_forward">Start Upload</string>
+    <string name="uxsdk_mqtt_stop_forward">Stop Upload</string>
+    <string name="uxsdk_mqtt_preview">MQTT Data Preview</string>
+    <string name="uxsdk_mqtt_no_data">No data</string>
+    <string name="uxsdk_mqtt_message_log">Message Log</string>
+    <string name="uxsdk_mqtt_clear">Clear</string>
+    <string name="uxsdk_mqtt_no_messages">No messages</string>
+    <string name="uxsdk_mqtt_error_required">Required</string>
+    <string name="uxsdk_mqtt_error_invalid_port">Invalid port</string>
+    <string name="uxsdk_mqtt_error_source_required">Select at least one upload data source</string>
+
 
 </resources>

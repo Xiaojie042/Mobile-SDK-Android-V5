@@ -238,6 +238,8 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         // 飞控数据转发 - Flight Data Forward (使用HD图标表示数据传输)
         menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_flight_data_trans_active, R.drawable.uxsdk_ic_setting_flight_data_trans));
 
+        menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_mqtt_active, R.drawable.uxsdk_ic_setting_mqtt));
+
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_RC));
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_HD));
@@ -247,6 +249,8 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_GIMBAL));
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_FLIGHT_DATA));
+
+        mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_MQTT));
 
         if (isSupportAdvRtk(false)) {
             menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_rtk_active, R.drawable.uxsdk_ic_setting_rtk));
