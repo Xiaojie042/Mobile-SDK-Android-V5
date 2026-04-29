@@ -23,6 +23,7 @@
 
 package dji.v5.ux.sample.showcase.defaultlayout;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -118,6 +119,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     private View mapSwapHotspot;
     private TextView gimbalAdjustDone;
     private GimbalFineTuneWidget gimbalFineTuneWidget;
+    private DefaultLayoutWaylineManager waylineManager;
     private ComponentIndexType lastDevicePosition = ComponentIndexType.UNKNOWN;
     private CameraLensType lastLensType = CameraLensType.UNKNOWN;
     private final List<ComponentIndexType> latestAvailableCameraList = new ArrayList<>();
@@ -181,6 +183,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         gimbalFineTuneWidget = findViewById(R.id.setting_menu_gimbal_fine_tune);
         mapWidget = findViewById(R.id.widget_map);
         mapSwapHotspot = findViewById(R.id.view_map_swap_hotspot);
+        waylineManager = new DefaultLayoutWaylineManager(this, mapWidget, defaultLayoutRoot);
 
         initClickListener();
         MediaDataCenter.getInstance().getCameraStreamManager().addAvailableCameraUpdatedListener(availableCameraUpdatedListener);
@@ -247,6 +250,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
             if (uiSetting != null) {
                 uiSetting.setZoomControlsEnabled(false);//hide zoom widget
             }
+            waylineManager.onMapReady();
         };
         LogUtils.i(TAG, "init default map provider=AMAP");
         mapWidget.initAMap(this, listener);
@@ -282,6 +286,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         mapWidget.setLayoutParams(mapLayoutParams);
         fpvParentView.setLayoutParams(fpvLayoutParams);
         mapSwapHotspot.setLayoutParams(hotspotLayoutParams);
+        waylineManager.setExpanded(isMapExpanded);
         updateLayoutZOrder();
         defaultLayoutRoot.requestLayout();
     }
@@ -355,6 +360,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
         if (isMapExpanded) {
             fpvParentView.bringToFront();
+            waylineManager.bringPanelToFront();
         } else {
             mapWidget.bringToFront();
         }
@@ -365,6 +371,7 @@ public class DefaultLayoutActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        waylineManager.onDestroy();
         mapWidget.onDestroy();
         MediaDataCenter.getInstance().getCameraStreamManager().removeAvailableCameraUpdatedListener(availableCameraUpdatedListener);
         DJINetworkManager.getInstance().removeNetworkStatusListener(networkStatusListener);
@@ -579,5 +586,13 @@ public class DefaultLayoutActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (waylineManager != null && waylineManager.onActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

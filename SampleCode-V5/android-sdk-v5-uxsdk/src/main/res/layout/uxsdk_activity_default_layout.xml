@@ -288,6 +288,146 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <ScrollView
+            android:id="@+id/uxsdk_wayline_panel"
+            android:layout_width="260dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#CC111820"
+            android:fillViewport="false"
+            android:padding="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/widget_horizontal_situation_indicator"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/panel_top_bar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/uxsdk_wayline_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="航线管理"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/uxsdk_wayline_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="放大地图后可导入 KMZ 或点选添加航点"
+                    android:textColor="#DDFFFFFF"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/uxsdk_wayline_selected_ids"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="航线ID：全部"
+                    android:textColor="#BBFFFFFF"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_import_kmz"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="10dp"
+                    android:text="导入KMZ"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_add_point"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="添加航点"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_save_kmz"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="保存航线"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_clear"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="清空航线"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_upload"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="8dp"
+                    android:text="上传KMZ"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_select_ids"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="选择航线ID"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_start"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="开始任务"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_pause"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="暂停任务"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_resume"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="恢复任务"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/uxsdk_wayline_stop"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="停止任务"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/uxsdk_wayline_execute_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="任务状态：--"
+                    android:textColor="#DDFFFFFF"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/uxsdk_wayline_execute_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="执行信息：--"
+                    android:textColor="#DDFFFFFF"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </ScrollView>
+
         <dji.v5.ux.core.panel.systemstatus.SystemStatusListPanelWidget
             android:id="@+id/widget_panel_system_status_list"
             android:layout_width="0dp"
