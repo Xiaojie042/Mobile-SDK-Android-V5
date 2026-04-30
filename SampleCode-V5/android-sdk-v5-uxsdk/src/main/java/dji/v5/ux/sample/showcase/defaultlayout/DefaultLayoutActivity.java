@@ -579,6 +579,9 @@ public class DefaultLayoutActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if (waylineManager != null && waylineManager.handleBackPressed()) {
+            return;
+        }
         if (isMapExpanded) {
             toggleMapSize();
         } else if (mDrawerLayout.isDrawerOpen(GravityCompat.END)) {

@@ -288,145 +288,684 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <ScrollView
-            android:id="@+id/uxsdk_wayline_panel"
-            android:layout_width="260dp"
+        <View
+            android:id="@+id/uxsdk_wayline_panel_scrim"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="#CC111820"
-            android:fillViewport="false"
-            android:padding="10dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="false"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/widget_horizontal_situation_indicator"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/panel_top_bar">
+            app:layout_constraintTop_toBottomOf="@id/panel_top_bar" />
+
+        <LinearLayout
+            android:id="@+id/uxsdk_wayline_entry_group"
+            android:layout_width="74dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/panel_top_bar"
+            app:layout_constraintVertical_bias="0.22">
+
+            <TextView
+                android:id="@+id/uxsdk_wayline_entry_route"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:background="@drawable/uxsdk_wayline_entry_button_bg"
+                android:drawableStart="@drawable/uxsdk_ic_route_list"
+                android:drawableLeft="@drawable/uxsdk_ic_route_list"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:paddingLeft="8dp"
+                android:paddingEnd="8dp"
+                android:paddingRight="8dp"
+                android:text="航线"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/uxsdk_wayline_entry_waypoint"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/uxsdk_wayline_entry_button_bg"
+                android:drawableStart="@drawable/uxsdk_ic_edit_location"
+                android:drawableLeft="@drawable/uxsdk_ic_edit_location"
+                android:drawablePadding="4dp"
+                android:gravity="center"
+                android:paddingStart="8dp"
+                android:paddingLeft="8dp"
+                android:paddingEnd="8dp"
+                android:paddingRight="8dp"
+                android:text="航点"
+                android:textColor="@android:color/white"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/uxsdk_wayline_panel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/uxsdk_wayline_panel_bg"
+            android:elevation="8dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/panel_top_bar"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.28">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingLeft="16dp"
+                android:paddingEnd="16dp"
+                android:paddingRight="16dp">
 
                 <TextView
-                    android:id="@+id/uxsdk_wayline_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="航线管理"
+                    android:id="@+id/uxsdk_wayline_tab_route"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/uxsdk_wayline_tab_selected_bg"
+                    android:gravity="center"
+                    android:text="航线"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/uxsdk_wayline_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="放大地图后可导入 KMZ 或点选添加航点"
-                    android:textColor="#DDFFFFFF"
-                    android:textSize="12sp" />
+                    android:id="@+id/uxsdk_wayline_tab_waypoint"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/uxsdk_wayline_tab_unselected_bg"
+                    android:gravity="center"
+                    android:text="航点编辑"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/uxsdk_wayline_selected_ids"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="航线ID：全部"
-                    android:textColor="#BBFFFFFF"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_import_kmz"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginTop="10dp"
-                    android:text="导入KMZ"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_add_point"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="添加航点"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_save_kmz"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="保存航线"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_clear"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="清空航线"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_upload"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:layout_marginTop="8dp"
-                    android:text="上传KMZ"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_select_ids"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="选择航线ID"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_start"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="开始任务"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_pause"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="暂停任务"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_resume"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="恢复任务"
-                    android:textSize="12sp" />
-
-                <Button
-                    android:id="@+id/uxsdk_wayline_stop"
-                    android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="停止任务"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/uxsdk_wayline_execute_state"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="任务状态：--"
-                    android:textColor="#DDFFFFFF"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/uxsdk_wayline_execute_info"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="执行信息：--"
-                    android:textColor="#DDFFFFFF"
-                    android:textSize="12sp" />
-
+                    android:id="@+id/uxsdk_wayline_panel_close"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/uxsdk_wayline_close_button_bg"
+                    android:gravity="center"
+                    android:text="×"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
             </LinearLayout>
-        </ScrollView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#3A3A3C" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <ScrollView
+                    android:id="@+id/uxsdk_wayline_route_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:fillViewport="false"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="航线导入与操作"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/uxsdk_wayline_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="导入 KMZ 或在航点编辑中放置航点"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/uxsdk_wayline_import_kmz"
+                            android:layout_width="match_parent"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                            android:drawableStart="@drawable/uxsdk_ic_import_kmz"
+                            android:drawableLeft="@drawable/uxsdk_ic_import_kmz"
+                            android:drawablePadding="8dp"
+                            android:gravity="center"
+                            android:text="导入 KMZ"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+
+                        <Button
+                            android:id="@+id/uxsdk_wayline_start"
+                            android:layout_width="match_parent"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/uxsdk_wayline_primary_button_bg"
+                            android:drawableStart="@drawable/uxsdk_ic_play"
+                            android:drawableLeft="@drawable/uxsdk_ic_play"
+                            android:drawablePadding="8dp"
+                            android:gravity="center"
+                            android:text="开始执行航线"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/uxsdk_wayline_card_bg"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="12dp"
+                            android:paddingLeft="12dp"
+                            android:paddingEnd="8dp"
+                            android:paddingRight="8dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="显示航线"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp" />
+
+                            <Switch
+                                android:id="@+id/uxsdk_wayline_visibility_switch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="选择航线"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/uxsdk_wayline_route_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/uxsdk_wayline_card_bg"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="航线信息"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_wayline_name_edit"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="航线名称"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/uxsdk_wayline_total_length"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="总长度：--"
+                                android:textColor="#AEAEB2"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/uxsdk_wayline_waypoint_count"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="航点数量：--"
+                                android:textColor="#AEAEB2"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/uxsdk_wayline_estimate_time"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="预计飞行时间：--"
+                                android:textColor="#AEAEB2"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:text="航线颜色"
+                                android:textColor="@android:color/white"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <HorizontalScrollView
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:clipToPadding="false"
+                                android:fillViewport="false"
+                                android:scrollbars="none"
+                                android:overScrollMode="never">
+
+                                <LinearLayout
+                                    android:id="@+id/uxsdk_wayline_color_picker"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal" />
+                            </HorizontalScrollView>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/uxsdk_wayline_selected_ids"
+                            android:layout_width="match_parent"
+                            android:layout_height="38dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/uxsdk_wayline_card_bg"
+                            android:gravity="center_vertical"
+                            android:paddingStart="10dp"
+                            android:paddingLeft="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingRight="10dp"
+                            android:singleLine="true"
+                            android:text="ID: --"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_upload"
+                                android:layout_width="match_parent"
+                                android:layout_height="38dp"
+                                android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                                android:text="上传 KMZ"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_pause"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                                android:text="暂停"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp" />
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_resume"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                                android:text="恢复"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp" />
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_stop"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/uxsdk_wayline_danger_button_bg"
+                                android:text="停止"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/uxsdk_wayline_execute_state"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="任务状态：--"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/uxsdk_wayline_execute_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="执行信息：--"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </ScrollView>
+
+                <ScrollView
+                    android:id="@+id/uxsdk_wayline_waypoint_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:fillViewport="false"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="全局操作"
+                            android:textColor="@android:color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/uxsdk_wayline_add_point"
+                            android:layout_width="match_parent"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/uxsdk_wayline_primary_button_bg"
+                            android:text="放置航点"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+
+                        <Button
+                            android:id="@+id/uxsdk_wayline_delete_point"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/uxsdk_wayline_danger_button_bg"
+                            android:text="删除当前选中航点"
+                            android:textAllCaps="false"
+                            android:textColor="@android:color/white"
+                            android:textSize="13sp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_save_kmz"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                                android:text="保存航迹"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="13sp" />
+
+                            <Button
+                                android:id="@+id/uxsdk_wayline_discard_edit"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginLeft="8dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                                android:text="放弃"
+                                android:textAllCaps="false"
+                                android:textColor="#AEAEB2"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/uxsdk_waypoint_hint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/uxsdk_wayline_card_bg"
+                            android:padding="10dp"
+                            android:text="点击“放置航点”后，在地图任意位置点击即可添加；长按航点 marker 可拖动更新坐标。"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="航点列表"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/uxsdk_waypoint_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
+
+                        <LinearLayout
+                            android:id="@+id/uxsdk_waypoint_detail_card"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/uxsdk_wayline_card_bg"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:id="@+id/uxsdk_waypoint_detail_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="航点 1 设置"
+                                android:textColor="@android:color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_waypoint_latitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="纬度"
+                                android:inputType="numberDecimal|numberSigned"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_waypoint_longitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="经度"
+                                android:inputType="numberDecimal|numberSigned"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_waypoint_height"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="高度（m）"
+                                android:inputType="numberDecimal|numberSigned"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_waypoint_speed"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="飞行速度（m/s）"
+                                android:inputType="numberDecimal"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <EditText
+                                android:id="@+id/uxsdk_waypoint_action"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="8dp"
+                                android:background="@drawable/uxsdk_wayline_edit_text_bg"
+                                android:hint="航点动作"
+                                android:inputType="text"
+                                android:maxLines="1"
+                                android:paddingStart="10dp"
+                                android:paddingLeft="10dp"
+                                android:paddingEnd="10dp"
+                                android:paddingRight="10dp"
+                                android:singleLine="true"
+                                android:textColor="@android:color/white"
+                                android:textColorHint="#66FFFFFF"
+                                android:textCursorDrawable="@null"
+                                android:textSize="13sp" />
+
+                            <Button
+                                android:id="@+id/uxsdk_waypoint_center"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_marginTop="12dp"
+                                android:background="@drawable/uxsdk_wayline_primary_button_bg"
+                                android:drawableStart="@drawable/uxsdk_ic_my_location"
+                                android:drawableLeft="@drawable/uxsdk_ic_my_location"
+                                android:drawablePadding="8dp"
+                                android:gravity="center"
+                                android:text="定位到航点"
+                                android:textAllCaps="false"
+                                android:textColor="@android:color/white"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/uxsdk_wayline_clear"
+                            android:layout_width="match_parent"
+                            android:layout_height="38dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/uxsdk_wayline_secondary_button_bg"
+                            android:text="清空当前航线"
+                            android:textAllCaps="false"
+                            android:textColor="#AEAEB2"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </ScrollView>
+            </FrameLayout>
+        </LinearLayout>
 
         <dji.v5.ux.core.panel.systemstatus.SystemStatusListPanelWidget
             android:id="@+id/widget_panel_system_status_list"
