@@ -1279,5 +1279,39 @@
     <string name="uxsdk_mqtt_error_invalid_port">Invalid port</string>
     <string name="uxsdk_mqtt_error_source_required">Select at least one upload data source</string>
 
+    <!-- Live Forward Settings -->
+    <string name="uxsdk_live_forward_title">Live Forward</string>
+    <string name="uxsdk_live_forward_protocol">Forward Protocol</string>
+    <string name="uxsdk_live_forward_gb28181">GB28181</string>
+    <string name="uxsdk_live_forward_rtmp">RTMP to PC</string>
+    <string name="uxsdk_live_forward_camera">Camera Source</string>
+    <string name="uxsdk_live_forward_camera_left">Main</string>
+    <string name="uxsdk_live_forward_camera_right">Right</string>
+    <string name="uxsdk_live_forward_camera_fpv">FPV</string>
+    <string name="uxsdk_live_forward_rtmp_url">RTMP URL, for example rtmp://192.168.1.100/live/drone</string>
+    <string name="uxsdk_live_forward_gb_server_ip">Server IP</string>
+    <string name="uxsdk_live_forward_gb_server_port">Server Port</string>
+    <string name="uxsdk_live_forward_gb_server_id">Server ID</string>
+    <string name="uxsdk_live_forward_gb_agent_id">Device ID</string>
+    <string name="uxsdk_live_forward_gb_channel">Channel ID</string>
+    <string name="uxsdk_live_forward_gb_local_port">Local Port</string>
+    <string name="uxsdk_live_forward_gb_password">Password</string>
+    <string name="uxsdk_live_forward_quality">Stream Quality</string>
+    <string name="uxsdk_live_forward_quality_sd">SD</string>
+    <string name="uxsdk_live_forward_quality_hd">HD</string>
+    <string name="uxsdk_live_forward_quality_fhd">FHD</string>
+    <string name="uxsdk_live_forward_start">Start Forward</string>
+    <string name="uxsdk_live_forward_stop">Stop Forward</string>
+    <string name="uxsdk_live_forward_status_idle">Live forward idle</string>
+    <string name="uxsdk_live_forward_status_template">Streaming: %1$b\nFPS: %2$d\nBitrate: %3$d bps\nPacket loss: %4$d\nRTT: %5$d ms\nResolution: %6$s</string>
+    <string name="uxsdk_live_forward_starting">Starting live forward...</string>
+    <string name="uxsdk_live_forward_start_success">Live forward started</string>
+    <string name="uxsdk_live_forward_start_failed">Start failed: %1$s</string>
+    <string name="uxsdk_live_forward_stop_success">Live forward stopped</string>
+    <string name="uxsdk_live_forward_stop_failed">Stop failed: %1$s</string>
+    <string name="uxsdk_live_forward_error_message">Live forward error: %1$s</string>
+    <string name="uxsdk_live_forward_error_required">Required</string>
+    <string name="uxsdk_live_forward_error_invalid_port">Invalid port</string>
+
 
 </resources>

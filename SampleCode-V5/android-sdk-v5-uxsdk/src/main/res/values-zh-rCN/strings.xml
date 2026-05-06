@@ -1260,6 +1260,39 @@
     <string name="uxsdk_mqtt_error_required">必填</string>
     <string name="uxsdk_mqtt_error_invalid_port">端口无效</string>
     <string name="uxsdk_mqtt_error_source_required">请至少选择一个上传数据源</string>
+    <!-- Live Forward Settings -->
+    <string name="uxsdk_live_forward_title">直播转发</string>
+    <string name="uxsdk_live_forward_protocol">转发协议</string>
+    <string name="uxsdk_live_forward_gb28181">GB28181</string>
+    <string name="uxsdk_live_forward_rtmp">RTMP到PC</string>
+    <string name="uxsdk_live_forward_camera">视频源</string>
+    <string name="uxsdk_live_forward_camera_left">主相机</string>
+    <string name="uxsdk_live_forward_camera_right">右相机</string>
+    <string name="uxsdk_live_forward_camera_fpv">FPV</string>
+    <string name="uxsdk_live_forward_rtmp_url">RTMP地址，例如 rtmp://192.168.1.100/live/drone</string>
+    <string name="uxsdk_live_forward_gb_server_ip">服务器IP</string>
+    <string name="uxsdk_live_forward_gb_server_port">服务器端口</string>
+    <string name="uxsdk_live_forward_gb_server_id">服务器ID</string>
+    <string name="uxsdk_live_forward_gb_agent_id">设备ID</string>
+    <string name="uxsdk_live_forward_gb_channel">通道ID</string>
+    <string name="uxsdk_live_forward_gb_local_port">本地端口</string>
+    <string name="uxsdk_live_forward_gb_password">密码</string>
+    <string name="uxsdk_live_forward_quality">直播清晰度</string>
+    <string name="uxsdk_live_forward_quality_sd">标清</string>
+    <string name="uxsdk_live_forward_quality_hd">高清</string>
+    <string name="uxsdk_live_forward_quality_fhd">全高清</string>
+    <string name="uxsdk_live_forward_start">开始转发</string>
+    <string name="uxsdk_live_forward_stop">停止转发</string>
+    <string name="uxsdk_live_forward_status_idle">直播转发未启动</string>
+    <string name="uxsdk_live_forward_status_template">转发中: %1$b\n帧率: %2$d\n码率: %3$d bps\n丢包: %4$d\nRTT: %5$d ms\n分辨率: %6$s</string>
+    <string name="uxsdk_live_forward_starting">正在启动直播转发...</string>
+    <string name="uxsdk_live_forward_start_success">直播转发已启动</string>
+    <string name="uxsdk_live_forward_start_failed">启动失败: %1$s</string>
+    <string name="uxsdk_live_forward_stop_success">直播转发已停止</string>
+    <string name="uxsdk_live_forward_stop_failed">停止失败: %1$s</string>
+    <string name="uxsdk_live_forward_error_message">直播转发错误: %1$s</string>
+    <string name="uxsdk_live_forward_error_required">必填</string>
+    <string name="uxsdk_live_forward_error_invalid_port">端口无效</string>
 </resources>
 
 

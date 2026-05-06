@@ -31,6 +31,7 @@ import dji.v5.ux.core.ui.setting.taplayout.VerticalTabLayout;
 import dji.v5.ux.core.ui.setting.ui.MenuFragment;
 import dji.v5.ux.core.ui.setting.ui.MenuFragmentFactory;
 import dji.v5.ux.core.ui.setting.ui.SettingMenuFragment;
+import dji.v5.ux.core.util.UXFeatureFlags;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -238,7 +239,13 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         // 飞控数据转发 - Flight Data Forward (使用HD图标表示数据传输)
         menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_flight_data_trans_active, R.drawable.uxsdk_ic_setting_flight_data_trans));
 
-        menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_mqtt_active, R.drawable.uxsdk_ic_setting_mqtt));
+        if (UXFeatureFlags.ENABLE_MQTT_UI) {
+            menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_mqtt_active, R.drawable.uxsdk_ic_setting_mqtt));
+        }
+
+        if (UXFeatureFlags.ENABLE_LIVE_FORWARD_UI) {
+            menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_flight_data_trans_active, R.drawable.uxsdk_ic_setting_flight_data_trans));
+        }
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_RC));
 
@@ -250,7 +257,13 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_FLIGHT_DATA));
 
-        mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_MQTT));
+        if (UXFeatureFlags.ENABLE_MQTT_UI) {
+            mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_MQTT));
+        }
+
+        if (UXFeatureFlags.ENABLE_LIVE_FORWARD_UI) {
+            mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_LIVE_FORWARD));
+        }
 
         if (isSupportAdvRtk(false)) {
             menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_rtk_active, R.drawable.uxsdk_ic_setting_rtk));

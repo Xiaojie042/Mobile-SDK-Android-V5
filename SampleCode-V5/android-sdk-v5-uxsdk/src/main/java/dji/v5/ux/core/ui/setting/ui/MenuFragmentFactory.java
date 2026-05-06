@@ -7,6 +7,7 @@ import dji.v5.ux.core.ui.setting.fragment.FlightDataFragment;
 import dji.v5.ux.core.ui.setting.fragment.FlycMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.GimbalMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.HDMenuFragment;
+import dji.v5.ux.core.ui.setting.fragment.LiveForwardFragment;
 import dji.v5.ux.core.ui.setting.fragment.MqttFragment;
 import dji.v5.ux.core.ui.setting.fragment.OmniPerceptionMenuFragment;
 import dji.v5.ux.core.ui.setting.fragment.PayloadFragment;
@@ -33,6 +34,7 @@ public class MenuFragmentFactory {
     public static final String FRAGMENT_TAG_PAYLOAD = "PayloadFragment";
     public static final String FRAGMENT_TAG_FLIGHT_DATA = "FlightDataFragment";
     public static final String FRAGMENT_TAG_MQTT = "MqttFragment";
+    public static final String FRAGMENT_TAG_LIVE_FORWARD = "LiveForwardFragment";
     public static final String FRAGMENT_TAG_SEARCHLIGHT_ACCESSORY = "SearchlightSettingFragment";
     public static final String FRAGMENT_TAG_RTK = "RtkMenuFragment";
 
@@ -57,6 +59,8 @@ public class MenuFragmentFactory {
             return new FlightDataFragment();
         } else if (FRAGMENT_TAG_MQTT.equals(tag)) {
             return new MqttFragment();
+        } else if (FRAGMENT_TAG_LIVE_FORWARD.equals(tag)) {
+            return new LiveForwardFragment();
         } else if (FRAGMENT_TAG_RTK.equals(tag)) {
             return new RtkMenuFragment();
         } else {
