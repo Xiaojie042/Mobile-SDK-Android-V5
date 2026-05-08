@@ -7,9 +7,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import dji.sdk.keyvalue.value.common.ComponentIndexType;
@@ -20,6 +22,7 @@ import dji.v5.manager.datacenter.livestream.LiveStreamSettings;
 import dji.v5.manager.datacenter.livestream.LiveStreamStatus;
 import dji.v5.manager.datacenter.livestream.LiveStreamStatusListener;
 import dji.v5.manager.datacenter.livestream.LiveStreamType;
+import dji.v5.manager.datacenter.livestream.LiveVideoBitrateMode;
 import dji.v5.manager.datacenter.livestream.StreamQuality;
 import dji.v5.manager.datacenter.livestream.settings.GB28181Settings;
 import dji.v5.manager.datacenter.livestream.settings.RtmpSettings;
@@ -39,14 +42,19 @@ public class LiveForwardFragment extends MenuFragment {
     private static final String PREF_GB28181_CONFIG = "uxsdk-live-forward-gb28181-config";
     private static final String CONFIG_SEPARATOR = "^_^";
     private static final int DEFAULT_GB28181_PORT = 15060;
+    private static final int MIN_VIDEO_BITRATE = 2 * 1024 * 1024;
+    private static final int MAX_VIDEO_BITRATE = 16 * 1024 * 1024;
+    private static final int DEFAULT_VIDEO_BITRATE_PROGRESS = 20;
 
     private ILiveStreamManager streamManager;
     private ICameraStreamManager cameraStreamManager;
     private RadioGroup rgProtocol;
     private RadioGroup rgCamera;
     private RadioGroup rgQuality;
+    private RadioGroup rgBitrate;
     private LinearLayout layoutRtmp;
     private LinearLayout layoutGb28181;
+    private LinearLayout layoutBitrateSlider;
     private EditText etRtmpUrl;
     private EditText etGbServerIp;
     private EditText etGbServerPort;
@@ -56,6 +64,8 @@ public class LiveForwardFragment extends MenuFragment {
     private EditText etGbLocalPort;
     private EditText etGbPassword;
     private TextView tvStatus;
+    private TextView tvBitrateValue;
+    private SeekBar sbBitrate;
     private Button btnStart;
     private Button btnStop;
 
@@ -137,8 +147,10 @@ public class LiveForwardFragment extends MenuFragment {
         rgProtocol = view.findViewById(R.id.rg_live_forward_protocol);
         rgCamera = view.findViewById(R.id.rg_live_forward_camera);
         rgQuality = view.findViewById(R.id.rg_live_forward_quality);
+        rgBitrate = view.findViewById(R.id.rg_live_forward_bitrate);
         layoutRtmp = view.findViewById(R.id.layout_live_forward_rtmp);
         layoutGb28181 = view.findViewById(R.id.layout_live_forward_gb28181);
+        layoutBitrateSlider = view.findViewById(R.id.layout_live_forward_bitrate_slider);
         etRtmpUrl = view.findViewById(R.id.et_live_forward_rtmp_url);
         etGbServerIp = view.findViewById(R.id.et_live_forward_gb_server_ip);
         etGbServerPort = view.findViewById(R.id.et_live_forward_gb_server_port);
@@ -148,6 +160,8 @@ public class LiveForwardFragment extends MenuFragment {
         etGbLocalPort = view.findViewById(R.id.et_live_forward_gb_local_port);
         etGbPassword = view.findViewById(R.id.et_live_forward_gb_password);
         tvStatus = view.findViewById(R.id.tv_live_forward_status);
+        tvBitrateValue = view.findViewById(R.id.tv_live_forward_bitrate_value);
+        sbBitrate = view.findViewById(R.id.sb_live_forward_bitrate);
         btnStart = view.findViewById(R.id.btn_live_forward_start);
         btnStop = view.findViewById(R.id.btn_live_forward_stop);
     }
@@ -211,6 +225,8 @@ public class LiveForwardFragment extends MenuFragment {
             });
             rgQuality.check(R.id.rb_live_forward_quality_hd);
         }
+
+        setupBitrateSelection();
     }
 
     private void setupButtons() {
@@ -232,6 +248,46 @@ public class LiveForwardFragment extends MenuFragment {
         }
     }
 
+    private void setupBitrateSelection() {
+        if (sbBitrate != null) {
+            sbBitrate.setMax(100);
+            sbBitrate.setProgress(DEFAULT_VIDEO_BITRATE_PROGRESS);
+            sbBitrate.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    updateBitrateValueText();
+                    if (fromUser && isManualBitrateSelected() && streamManager != null) {
+                        streamManager.setLiveVideoBitrate(getSelectedVideoBitrate());
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                    // No-op.
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    if (isManualBitrateSelected() && streamManager != null) {
+                        streamManager.setLiveVideoBitrate(getSelectedVideoBitrate());
+                    }
+                }
+            });
+        }
+
+        if (rgBitrate != null) {
+            rgBitrate.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    updateBitrateControls();
+                    applyBitrateSettings();
+                }
+            });
+            rgBitrate.check(R.id.rb_live_forward_bitrate_auto);
+        }
+        updateBitrateControls();
+    }
+
     private void updateProtocolVisibility() {
         boolean isRtmp = rgProtocol != null && rgProtocol.getCheckedRadioButtonId() == R.id.rb_live_forward_rtmp;
         if (layoutRtmp != null) {
@@ -251,6 +307,7 @@ public class LiveForwardFragment extends MenuFragment {
         streamManager.setCameraIndex(getSelectedCameraIndex());
         streamManager.setLiveStreamQuality(getSelectedQuality());
         streamManager.setLiveStreamScaleType(ICameraStreamManager.ScaleType.CENTER_CROP);
+        applyBitrateSettings();
 
         if (rgProtocol != null && rgProtocol.getCheckedRadioButtonId() == R.id.rb_live_forward_rtmp) {
             if (!applyRtmpConfig()) {
@@ -427,7 +484,45 @@ public class LiveForwardFragment extends MenuFragment {
         if (checkedId == R.id.rb_live_forward_quality_fhd) {
             return StreamQuality.FULL_HD;
         }
+        if (checkedId == R.id.rb_live_forward_quality_original) {
+            return StreamQuality.ORIGINAL;
+        }
         return StreamQuality.HD;
+    }
+
+    private boolean isManualBitrateSelected() {
+        return rgBitrate != null && rgBitrate.getCheckedRadioButtonId() == R.id.rb_live_forward_bitrate_manual;
+    }
+
+    private int getSelectedVideoBitrate() {
+        int progress = sbBitrate == null ? DEFAULT_VIDEO_BITRATE_PROGRESS : sbBitrate.getProgress();
+        return MIN_VIDEO_BITRATE + (MAX_VIDEO_BITRATE - MIN_VIDEO_BITRATE) * progress / 100;
+    }
+
+    private void applyBitrateSettings() {
+        if (streamManager == null) {
+            return;
+        }
+        if (isManualBitrateSelected()) {
+            streamManager.setLiveVideoBitrateMode(LiveVideoBitrateMode.MANUAL);
+            streamManager.setLiveVideoBitrate(getSelectedVideoBitrate());
+        } else {
+            streamManager.setLiveVideoBitrateMode(LiveVideoBitrateMode.AUTO);
+        }
+    }
+
+    private void updateBitrateControls() {
+        boolean manual = isManualBitrateSelected();
+        if (layoutBitrateSlider != null) {
+            layoutBitrateSlider.setVisibility(manual ? View.VISIBLE : View.GONE);
+        }
+        updateBitrateValueText();
+    }
+
+    private void updateBitrateValueText() {
+        if (tvBitrateValue != null) {
+            tvBitrateValue.setText(String.format(Locale.US, "%.1f Mbps", getSelectedVideoBitrate() / 1000000f));
+        }
     }
 
     private void updateStatus(LiveStreamStatus status) {
@@ -584,8 +679,10 @@ public class LiveForwardFragment extends MenuFragment {
         rgProtocol = null;
         rgCamera = null;
         rgQuality = null;
+        rgBitrate = null;
         layoutRtmp = null;
         layoutGb28181 = null;
+        layoutBitrateSlider = null;
         etRtmpUrl = null;
         etGbServerIp = null;
         etGbServerPort = null;
@@ -595,6 +692,8 @@ public class LiveForwardFragment extends MenuFragment {
         etGbLocalPort = null;
         etGbPassword = null;
         tvStatus = null;
+        tvBitrateValue = null;
+        sbBitrate = null;
         btnStart = null;
         btnStop = null;
 

@@ -1281,6 +1281,10 @@
     <string name="uxsdk_live_forward_quality_sd">标清</string>
     <string name="uxsdk_live_forward_quality_hd">高清</string>
     <string name="uxsdk_live_forward_quality_fhd">全高清</string>
+    <string name="uxsdk_live_forward_quality_original">原始图像</string>
+    <string name="uxsdk_live_forward_bitrate">视频码率</string>
+    <string name="uxsdk_live_forward_bitrate_auto">自动</string>
+    <string name="uxsdk_live_forward_bitrate_manual">手动</string>
     <string name="uxsdk_live_forward_start">开始转发</string>
     <string name="uxsdk_live_forward_stop">停止转发</string>
     <string name="uxsdk_live_forward_status_idle">直播转发未启动</string>

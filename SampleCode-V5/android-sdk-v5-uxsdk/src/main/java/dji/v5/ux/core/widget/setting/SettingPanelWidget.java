@@ -244,7 +244,7 @@ public class SettingPanelWidget extends ConstraintLayoutWidget<Boolean> {
         }
 
         if (UXFeatureFlags.ENABLE_LIVE_FORWARD_UI) {
-            menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_flight_data_trans_active, R.drawable.uxsdk_ic_setting_flight_data_trans));
+            menus.add(new MenuBean(R.drawable.uxsdk_ic_setting_live_forward_active, R.drawable.uxsdk_ic_setting_live_forward));
         }
 
         mFragments.add(SettingMenuFragment.newInstance(MenuFragmentFactory.FRAGMENT_TAG_RC));

@@ -1300,6 +1300,10 @@
     <string name="uxsdk_live_forward_quality_sd">SD</string>
     <string name="uxsdk_live_forward_quality_hd">HD</string>
     <string name="uxsdk_live_forward_quality_fhd">FHD</string>
+    <string name="uxsdk_live_forward_quality_original">Original</string>
+    <string name="uxsdk_live_forward_bitrate">Video Bitrate</string>
+    <string name="uxsdk_live_forward_bitrate_auto">Auto</string>
+    <string name="uxsdk_live_forward_bitrate_manual">Manual</string>
     <string name="uxsdk_live_forward_start">Start Forward</string>
     <string name="uxsdk_live_forward_stop">Stop Forward</string>
     <string name="uxsdk_live_forward_status_idle">Live forward idle</string>
