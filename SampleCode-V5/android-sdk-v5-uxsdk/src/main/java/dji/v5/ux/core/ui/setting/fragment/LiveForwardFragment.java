@@ -4,7 +4,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -24,7 +23,6 @@ import dji.v5.manager.datacenter.livestream.LiveStreamStatusListener;
 import dji.v5.manager.datacenter.livestream.LiveStreamType;
 import dji.v5.manager.datacenter.livestream.LiveVideoBitrateMode;
 import dji.v5.manager.datacenter.livestream.StreamQuality;
-import dji.v5.manager.datacenter.livestream.settings.GB28181Settings;
 import dji.v5.manager.datacenter.livestream.settings.RtmpSettings;
 import dji.v5.manager.interfaces.ICameraStreamManager;
 import dji.v5.manager.interfaces.ILiveStreamManager;
@@ -39,35 +37,22 @@ public class LiveForwardFragment extends MenuFragment {
 
     private static final String TAG = "LiveForwardFragment";
     private static final String PREF_RTMP_URL = "uxsdk-live-forward-rtmp-url";
-    private static final String PREF_GB28181_CONFIG = "uxsdk-live-forward-gb28181-config";
-    private static final String CONFIG_SEPARATOR = "^_^";
-    private static final int DEFAULT_GB28181_PORT = 15060;
     private static final int MIN_VIDEO_BITRATE = 2 * 1024 * 1024;
     private static final int MAX_VIDEO_BITRATE = 16 * 1024 * 1024;
     private static final int DEFAULT_VIDEO_BITRATE_PROGRESS = 20;
 
     private ILiveStreamManager streamManager;
     private ICameraStreamManager cameraStreamManager;
-    private RadioGroup rgProtocol;
     private RadioGroup rgCamera;
     private RadioGroup rgQuality;
     private RadioGroup rgBitrate;
-    private LinearLayout layoutRtmp;
-    private LinearLayout layoutGb28181;
-    private LinearLayout layoutBitrateSlider;
     private EditText etRtmpUrl;
-    private EditText etGbServerIp;
-    private EditText etGbServerPort;
-    private EditText etGbServerId;
-    private EditText etGbAgentId;
-    private EditText etGbChannel;
-    private EditText etGbLocalPort;
-    private EditText etGbPassword;
     private TextView tvStatus;
     private TextView tvBitrateValue;
     private SeekBar sbBitrate;
     private Button btnStart;
     private Button btnStop;
+    private boolean isBindingUiState;
 
     private final LiveStreamStatusListener liveStreamStatusListener = new LiveStreamStatusListener() {
         @Override
@@ -106,7 +91,7 @@ public class LiveForwardFragment extends MenuFragment {
 
                 @Override
                 public void onCameraStreamEnableUpdate(Map<ComponentIndexType, Boolean> cameraStreamEnableMap) {
-                    // No-op. This page only needs the available source list.
+                    // No-op.
                 }
             };
 
@@ -130,9 +115,10 @@ public class LiveForwardFragment extends MenuFragment {
         streamManager = MediaDataCenter.getInstance().getLiveStreamManager();
         cameraStreamManager = MediaDataCenter.getInstance().getCameraStreamManager();
         initViews(mFragmentRoot);
-        populateInputFields();
         setupSelections();
         setupButtons();
+        populateInputFields();
+        bindCurrentStreamState();
 
         if (streamManager != null) {
             streamManager.addLiveStreamStatusListener(liveStreamStatusListener);
@@ -144,21 +130,10 @@ public class LiveForwardFragment extends MenuFragment {
     }
 
     private void initViews(View view) {
-        rgProtocol = view.findViewById(R.id.rg_live_forward_protocol);
         rgCamera = view.findViewById(R.id.rg_live_forward_camera);
         rgQuality = view.findViewById(R.id.rg_live_forward_quality);
         rgBitrate = view.findViewById(R.id.rg_live_forward_bitrate);
-        layoutRtmp = view.findViewById(R.id.layout_live_forward_rtmp);
-        layoutGb28181 = view.findViewById(R.id.layout_live_forward_gb28181);
-        layoutBitrateSlider = view.findViewById(R.id.layout_live_forward_bitrate_slider);
         etRtmpUrl = view.findViewById(R.id.et_live_forward_rtmp_url);
-        etGbServerIp = view.findViewById(R.id.et_live_forward_gb_server_ip);
-        etGbServerPort = view.findViewById(R.id.et_live_forward_gb_server_port);
-        etGbServerId = view.findViewById(R.id.et_live_forward_gb_server_id);
-        etGbAgentId = view.findViewById(R.id.et_live_forward_gb_agent_id);
-        etGbChannel = view.findViewById(R.id.et_live_forward_gb_channel);
-        etGbLocalPort = view.findViewById(R.id.et_live_forward_gb_local_port);
-        etGbPassword = view.findViewById(R.id.et_live_forward_gb_password);
         tvStatus = view.findViewById(R.id.tv_live_forward_status);
         tvBitrateValue = view.findViewById(R.id.tv_live_forward_bitrate_value);
         sbBitrate = view.findViewById(R.id.sb_live_forward_bitrate);
@@ -166,64 +141,27 @@ public class LiveForwardFragment extends MenuFragment {
         btnStop = view.findViewById(R.id.btn_live_forward_stop);
     }
 
-    private void populateInputFields() {
-        String rtmpUrl = DjiSharedPreferencesManager.getString(ContextUtil.getContext(),
-                PREF_RTMP_URL, "rtmp://192.168.1.100/live/drone");
-        setEditText(etRtmpUrl, rtmpUrl);
-
-        String gbConfig = DjiSharedPreferencesManager.getString(ContextUtil.getContext(),
-                PREF_GB28181_CONFIG, "");
-        if (!TextUtils.isEmpty(gbConfig)) {
-            String[] configs = gbConfig.split("\\^_\\^", -1);
-            if (configs.length >= 7) {
-                setEditText(etGbServerIp, configs[0]);
-                setEditText(etGbServerPort, configs[1]);
-                setEditText(etGbServerId, configs[2]);
-                setEditText(etGbAgentId, configs[3]);
-                setEditText(etGbChannel, configs[4]);
-                setEditText(etGbLocalPort, configs[5]);
-                setEditText(etGbPassword, configs[6]);
-                return;
-            }
-        }
-        setEditText(etGbServerPort, String.valueOf(DEFAULT_GB28181_PORT));
-        setEditText(etGbLocalPort, String.valueOf(DEFAULT_GB28181_PORT));
-    }
-
     private void setupSelections() {
-        if (rgProtocol != null) {
-            rgProtocol.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    updateProtocolVisibility();
-                }
-            });
-            rgProtocol.check(R.id.rb_live_forward_gb28181);
-            updateProtocolVisibility();
-        }
-
         if (rgCamera != null) {
             rgCamera.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    if (streamManager != null) {
+                    if (!isBindingUiState && streamManager != null) {
                         streamManager.setCameraIndex(getSelectedCameraIndex());
                     }
                 }
             });
-            rgCamera.check(R.id.rb_live_forward_camera_left);
         }
 
         if (rgQuality != null) {
             rgQuality.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    if (streamManager != null) {
+                    if (!isBindingUiState && streamManager != null) {
                         streamManager.setLiveStreamQuality(getSelectedQuality());
                     }
                 }
             });
-            rgQuality.check(R.id.rb_live_forward_quality_hd);
         }
 
         setupBitrateSelection();
@@ -256,7 +194,7 @@ public class LiveForwardFragment extends MenuFragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     updateBitrateValueText();
-                    if (fromUser && isManualBitrateSelected() && streamManager != null) {
+                    if (fromUser && !isBindingUiState && isManualBitrateSelected() && streamManager != null) {
                         streamManager.setLiveVideoBitrate(getSelectedVideoBitrate());
                     }
                 }
@@ -268,7 +206,7 @@ public class LiveForwardFragment extends MenuFragment {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    if (isManualBitrateSelected() && streamManager != null) {
+                    if (!isBindingUiState && isManualBitrateSelected() && streamManager != null) {
                         streamManager.setLiveVideoBitrate(getSelectedVideoBitrate());
                     }
                 }
@@ -280,22 +218,57 @@ public class LiveForwardFragment extends MenuFragment {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     updateBitrateControls();
-                    applyBitrateSettings();
+                    if (!isBindingUiState) {
+                        applyBitrateSettings();
+                    }
                 }
             });
-            rgBitrate.check(R.id.rb_live_forward_bitrate_auto);
         }
-        updateBitrateControls();
     }
 
-    private void updateProtocolVisibility() {
-        boolean isRtmp = rgProtocol != null && rgProtocol.getCheckedRadioButtonId() == R.id.rb_live_forward_rtmp;
-        if (layoutRtmp != null) {
-            layoutRtmp.setVisibility(isRtmp ? View.VISIBLE : View.GONE);
+    private void populateInputFields() {
+        String rtmpUrl = DjiSharedPreferencesManager.getString(ContextUtil.getContext(),
+                PREF_RTMP_URL, "rtmp://192.168.1.100/live/drone");
+        if (streamManager != null) {
+            LiveStreamSettings settings = streamManager.getLiveStreamSettings();
+            if (settings != null
+                    && settings.getLiveStreamType() == LiveStreamType.RTMP
+                    && settings.getRtmpSettings() != null
+                    && !TextUtils.isEmpty(settings.getRtmpSettings().getUrl())) {
+                rtmpUrl = settings.getRtmpSettings().getUrl();
+            }
         }
-        if (layoutGb28181 != null) {
-            layoutGb28181.setVisibility(isRtmp ? View.GONE : View.VISIBLE);
+        setEditText(etRtmpUrl, rtmpUrl);
+    }
+
+    private void bindCurrentStreamState() {
+        isBindingUiState = true;
+        try {
+            checkCameraButton(getSafeCameraIndex());
+            checkQualityButton(getSafeStreamQuality());
+
+            LiveVideoBitrateMode bitrateMode = getSafeBitrateMode();
+            if (rgBitrate != null) {
+                int targetId = bitrateMode == LiveVideoBitrateMode.MANUAL
+                        ? R.id.rb_live_forward_bitrate_manual
+                        : R.id.rb_live_forward_bitrate_auto;
+                if (rgBitrate.getCheckedRadioButtonId() != targetId) {
+                    rgBitrate.check(targetId);
+                }
+            }
+
+            if (sbBitrate != null) {
+                int bitrate = streamManager == null ? 0 : streamManager.getLiveVideoBitrate();
+                if (bitrate > 0) {
+                    sbBitrate.setProgress(toBitrateProgress(bitrate));
+                } else {
+                    sbBitrate.setProgress(DEFAULT_VIDEO_BITRATE_PROGRESS);
+                }
+            }
+        } finally {
+            isBindingUiState = false;
         }
+        updateBitrateControls();
     }
 
     private void startLiveForward() {
@@ -309,14 +282,8 @@ public class LiveForwardFragment extends MenuFragment {
         streamManager.setLiveStreamScaleType(ICameraStreamManager.ScaleType.CENTER_CROP);
         applyBitrateSettings();
 
-        if (rgProtocol != null && rgProtocol.getCheckedRadioButtonId() == R.id.rb_live_forward_rtmp) {
-            if (!applyRtmpConfig()) {
-                return;
-            }
-        } else {
-            if (!applyGb28181Config()) {
-                return;
-            }
+        if (!applyRtmpConfig()) {
+            return;
         }
 
         setStatusText(StringUtils.getResStr(ContextUtil.getContext(), R.string.uxsdk_live_forward_starting));
@@ -366,68 +333,6 @@ public class LiveForwardFragment extends MenuFragment {
         return true;
     }
 
-    private boolean applyGb28181Config() {
-        String serverIp = getInputText(etGbServerIp);
-        String serverPortText = getInputText(etGbServerPort);
-        String serverId = getInputText(etGbServerId);
-        String agentId = getInputText(etGbAgentId);
-        String channel = getInputText(etGbChannel);
-        String localPortText = getInputText(etGbLocalPort);
-        String password = getInputText(etGbPassword);
-
-        if (TextUtils.isEmpty(serverIp)) {
-            setInputError(etGbServerIp, R.string.uxsdk_live_forward_error_required);
-            return false;
-        }
-        if (TextUtils.isEmpty(serverId)) {
-            setInputError(etGbServerId, R.string.uxsdk_live_forward_error_required);
-            return false;
-        }
-        if (TextUtils.isEmpty(agentId)) {
-            setInputError(etGbAgentId, R.string.uxsdk_live_forward_error_required);
-            return false;
-        }
-        if (TextUtils.isEmpty(channel)) {
-            setInputError(etGbChannel, R.string.uxsdk_live_forward_error_required);
-            return false;
-        }
-        if (TextUtils.isEmpty(password)) {
-            setInputError(etGbPassword, R.string.uxsdk_live_forward_error_required);
-            return false;
-        }
-
-        int serverPort = parsePort(etGbServerPort, serverPortText);
-        if (serverPort <= 0) {
-            return false;
-        }
-        int localPort = parsePort(etGbLocalPort, localPortText);
-        if (localPort <= 0) {
-            return false;
-        }
-
-        GB28181Settings gb28181Settings = new GB28181Settings.Builder()
-                .setServerIP(serverIp)
-                .setServerPort(serverPort)
-                .setServerID(serverId)
-                .setAgentID(agentId)
-                .setChannel(channel)
-                .setLocalPort(localPort)
-                .setPassword(password)
-                .build();
-        LiveStreamSettings settings = new LiveStreamSettings.Builder()
-                .setLiveStreamType(LiveStreamType.GB28181)
-                .setGB28181Settings(gb28181Settings)
-                .build();
-        streamManager.setLiveStreamSettings(settings);
-
-        String gbConfig = serverIp + CONFIG_SEPARATOR + serverPort + CONFIG_SEPARATOR
-                + serverId + CONFIG_SEPARATOR + agentId + CONFIG_SEPARATOR
-                + channel + CONFIG_SEPARATOR + localPort + CONFIG_SEPARATOR + password;
-        DjiSharedPreferencesManager.putString(ContextUtil.getContext(), PREF_GB28181_CONFIG, gbConfig);
-        LogUtils.d(TAG, "Apply GB28181 live forward config: " + serverIp + ":" + serverPort);
-        return true;
-    }
-
     private void stopLiveForward() {
         if (streamManager == null) {
             return;
@@ -456,6 +361,59 @@ public class LiveForwardFragment extends MenuFragment {
                 });
             }
         });
+    }
+
+    private ComponentIndexType getSafeCameraIndex() {
+        if (streamManager == null || streamManager.getCameraIndex() == null) {
+            return ComponentIndexType.LEFT_OR_MAIN;
+        }
+        return streamManager.getCameraIndex();
+    }
+
+    private StreamQuality getSafeStreamQuality() {
+        if (streamManager == null || streamManager.getLiveStreamQuality() == null) {
+            return StreamQuality.HD;
+        }
+        return streamManager.getLiveStreamQuality();
+    }
+
+    private LiveVideoBitrateMode getSafeBitrateMode() {
+        if (streamManager == null || streamManager.getLiveVideoBitrateMode() == null) {
+            return LiveVideoBitrateMode.AUTO;
+        }
+        return streamManager.getLiveVideoBitrateMode();
+    }
+
+    private void checkCameraButton(ComponentIndexType cameraIndex) {
+        if (rgCamera == null) {
+            return;
+        }
+        int targetId = R.id.rb_live_forward_camera_left;
+        if (cameraIndex == ComponentIndexType.RIGHT) {
+            targetId = R.id.rb_live_forward_camera_right;
+        } else if (cameraIndex == ComponentIndexType.FPV) {
+            targetId = R.id.rb_live_forward_camera_fpv;
+        }
+        if (rgCamera.getCheckedRadioButtonId() != targetId) {
+            rgCamera.check(targetId);
+        }
+    }
+
+    private void checkQualityButton(StreamQuality quality) {
+        if (rgQuality == null) {
+            return;
+        }
+        int targetId = R.id.rb_live_forward_quality_hd;
+        if (quality == StreamQuality.SD) {
+            targetId = R.id.rb_live_forward_quality_sd;
+        } else if (quality == StreamQuality.FULL_HD) {
+            targetId = R.id.rb_live_forward_quality_fhd;
+        } else if (quality == StreamQuality.ORIGINAL) {
+            targetId = R.id.rb_live_forward_quality_original;
+        }
+        if (rgQuality.getCheckedRadioButtonId() != targetId) {
+            rgQuality.check(targetId);
+        }
     }
 
     private ComponentIndexType getSelectedCameraIndex() {
@@ -499,6 +457,11 @@ public class LiveForwardFragment extends MenuFragment {
         return MIN_VIDEO_BITRATE + (MAX_VIDEO_BITRATE - MIN_VIDEO_BITRATE) * progress / 100;
     }
 
+    private int toBitrateProgress(int bitrate) {
+        int safeBitrate = Math.max(MIN_VIDEO_BITRATE, Math.min(MAX_VIDEO_BITRATE, bitrate));
+        return (safeBitrate - MIN_VIDEO_BITRATE) * 100 / (MAX_VIDEO_BITRATE - MIN_VIDEO_BITRATE);
+    }
+
     private void applyBitrateSettings() {
         if (streamManager == null) {
             return;
@@ -513,10 +476,13 @@ public class LiveForwardFragment extends MenuFragment {
 
     private void updateBitrateControls() {
         boolean manual = isManualBitrateSelected();
-        if (layoutBitrateSlider != null) {
-            layoutBitrateSlider.setVisibility(manual ? View.VISIBLE : View.GONE);
+        if (sbBitrate != null) {
+            sbBitrate.setVisibility(manual ? View.VISIBLE : View.GONE);
         }
         updateBitrateValueText();
+        if (tvBitrateValue != null) {
+            tvBitrateValue.setVisibility(manual ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void updateBitrateValueText() {
@@ -581,29 +547,8 @@ public class LiveForwardFragment extends MenuFragment {
         }
     }
 
-    private int parsePort(EditText editText, String portText) {
-        try {
-            int port = Integer.parseInt(portText);
-            if (port <= 0 || port > 65535) {
-                setInputError(editText, R.string.uxsdk_live_forward_error_invalid_port);
-                return -1;
-            }
-            return port;
-        } catch (NumberFormatException e) {
-            setInputError(editText, R.string.uxsdk_live_forward_error_invalid_port);
-            return -1;
-        }
-    }
-
     private void clearInputErrors() {
         clearInputError(etRtmpUrl);
-        clearInputError(etGbServerIp);
-        clearInputError(etGbServerPort);
-        clearInputError(etGbServerId);
-        clearInputError(etGbAgentId);
-        clearInputError(etGbChannel);
-        clearInputError(etGbLocalPort);
-        clearInputError(etGbPassword);
     }
 
     private void updateButtonStates(boolean streaming) {
@@ -612,16 +557,6 @@ public class LiveForwardFragment extends MenuFragment {
         }
         if (btnStop != null) {
             btnStop.setEnabled(streaming);
-        }
-        if (rgProtocol != null) {
-            setGroupEnabled(rgProtocol, !streaming);
-        }
-    }
-
-    private void setGroupEnabled(RadioGroup group, boolean enabled) {
-        group.setEnabled(enabled);
-        for (int i = 0; i < group.getChildCount(); i++) {
-            group.getChildAt(i).setEnabled(enabled);
         }
     }
 
@@ -676,26 +611,16 @@ public class LiveForwardFragment extends MenuFragment {
 
         streamManager = null;
         cameraStreamManager = null;
-        rgProtocol = null;
         rgCamera = null;
         rgQuality = null;
         rgBitrate = null;
-        layoutRtmp = null;
-        layoutGb28181 = null;
-        layoutBitrateSlider = null;
         etRtmpUrl = null;
-        etGbServerIp = null;
-        etGbServerPort = null;
-        etGbServerId = null;
-        etGbAgentId = null;
-        etGbChannel = null;
-        etGbLocalPort = null;
-        etGbPassword = null;
         tvStatus = null;
         tvBitrateValue = null;
         sbBitrate = null;
         btnStart = null;
         btnStop = null;
+        isBindingUiState = false;
 
         super.onDestroyView();
     }

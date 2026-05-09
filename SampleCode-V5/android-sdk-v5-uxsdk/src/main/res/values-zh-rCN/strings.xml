@@ -1265,6 +1265,7 @@
     <string name="uxsdk_live_forward_protocol">转发协议</string>
     <string name="uxsdk_live_forward_gb28181">GB28181</string>
     <string name="uxsdk_live_forward_rtmp">RTMP到PC</string>
+    <string name="uxsdk_live_forward_rtmp_only">当前版本仅保留RTMP转发。</string>
     <string name="uxsdk_live_forward_camera">视频源</string>
     <string name="uxsdk_live_forward_camera_left">主相机</string>
     <string name="uxsdk_live_forward_camera_right">右相机</string>
