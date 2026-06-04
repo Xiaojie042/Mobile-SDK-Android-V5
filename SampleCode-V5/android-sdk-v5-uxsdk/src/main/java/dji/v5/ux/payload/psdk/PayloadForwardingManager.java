@@ -267,7 +267,7 @@ public final class PayloadForwardingManager {
         payloadDataListener = new PayloadDataListener() {
             @Override
             public void onDataFromPayloadUpdate(byte[] data) {
-                if (data == null || data.length == 0) {
+                if (data == null || data.length == 0 || containsOnlyLineBreaks(data)) {
                     return;
                 }
 
@@ -385,6 +385,18 @@ public final class PayloadForwardingManager {
         infoText.append("连接状态: ").append(info.isConnected() ? "已连接" : "未连接").append("\n");
         infoText.append("上传带宽: ").append(info.getUploadBandwidth()).append(" KB/s");
         return infoText.toString();
+    }
+
+    private boolean containsOnlyLineBreaks(byte[] data) {
+        if (data == null || data.length == 0) {
+            return true;
+        }
+        for (byte value : data) {
+            if (value != '\r' && value != '\n') {
+                return false;
+            }
+        }
+        return true;
     }
 
     private String constructJsonData(String psdkData) {

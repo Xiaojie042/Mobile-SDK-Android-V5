@@ -31,6 +31,7 @@ import androidx.annotation.NonNull;
 import dji.sdk.keyvalue.key.FlightControllerKey;
 import dji.sdk.keyvalue.key.GimbalKey;
 import dji.sdk.keyvalue.key.KeyTools;
+import dji.sdk.keyvalue.value.common.Attitude;
 import dji.sdk.keyvalue.value.common.LocationCoordinate2D;
 import dji.sdk.keyvalue.value.common.LocationCoordinate3D;
 import dji.v5.common.callback.CommonCallbacks;
@@ -64,6 +65,7 @@ public class MapWidgetModel extends WidgetModel {
     private final DataProcessor<LocationCoordinate3D> aircraftLocationDataProcessor;
     private final DataProcessor<LocationCoordinate2D> homeLocationDataProcessor;
     private final DataProcessor<Double> gimbalYawDataProcessor;
+    private final DataProcessor<Attitude> aircraftAttitudeDataProcessor;
     private final DataProcessor<Double> aircraftHeadingDataProcessor;
     private final DataProcessor<String> flightControllerSerialNumberDataProcessor;
     public final DataProcessor<List<FlyZoneInformation>> flyZoneInformationDataProcessor;
@@ -105,6 +107,7 @@ public class MapWidgetModel extends WidgetModel {
         homeLocationDataProcessor =
                 DataProcessor.create(new LocationCoordinate2D(INVALID_COORDINATE, INVALID_COORDINATE));
         gimbalYawDataProcessor = DataProcessor.create(0.0d);
+        aircraftAttitudeDataProcessor = DataProcessor.create(new Attitude());
         aircraftHeadingDataProcessor = DataProcessor.create(0.0d);
         flightControllerSerialNumberDataProcessor = DataProcessor.create("");
         flyZoneInformationDataProcessor = DataProcessor.create(new CopyOnWriteArrayList<>());
@@ -121,7 +124,8 @@ public class MapWidgetModel extends WidgetModel {
         bindDataProcessor(KeyTools.createKey(FlightControllerKey.KeyHomeLocation), homeLocationDataProcessor);
         bindDataProcessor(KeyTools.createKey(GimbalKey.KeyYawRelativeToAircraftHeading), gimbalYawDataProcessor);
         bindDataProcessor(KeyTools.createKey(FlightControllerKey.KeySerialNumber), flightControllerSerialNumberDataProcessor);
-        bindDataProcessor(KeyTools.createKey(FlightControllerKey.KeyCompassHeading), aircraftHeadingDataProcessor);
+        bindDataProcessor(KeyTools.createKey(FlightControllerKey.KeyAircraftAttitude), aircraftAttitudeDataProcessor,
+                attitude -> aircraftHeadingDataProcessor.onNext(normalizeHeading(attitude == null ? null : attitude.getYaw())));
         FlyZoneManager.getInstance().addFlySafeNotificationListener(flySafeNotificationListener);
     }
 
@@ -133,6 +137,20 @@ public class MapWidgetModel extends WidgetModel {
     @Override
     protected void updateStates() {
         // No code
+    }
+
+    private double normalizeHeading(Double yaw) {
+        if (yaw == null) {
+            return 0.0d;
+        }
+        double normalizedYaw = yaw;
+        while (normalizedYaw > 180.0d) {
+            normalizedYaw -= 360.0d;
+        }
+        while (normalizedYaw <= -180.0d) {
+            normalizedYaw += 360.0d;
+        }
+        return normalizedYaw;
     }
 
     private void updateFlyZoneInformation() {

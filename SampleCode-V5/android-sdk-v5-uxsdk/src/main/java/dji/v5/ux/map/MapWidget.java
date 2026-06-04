@@ -510,6 +510,7 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
                 .zIndex(AIRCRAFT_MARKER_ELEVATION)
                 .visible(aircraftMarkerEnabled);
         aircraftMarker = map.addMarker(aircraftMarkerOptions);
+        rotateAircraftMarker(aircraftMarkerHeading);
 
         DJIMarkerOptions gimbalMarkerOptions = new DJIMarkerOptions()
                 .position(aircraftPosition)
@@ -556,14 +557,13 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
     }
 
     private void updateAircraftHeading(float aircraftHeading) {
-        if (((aircraftHeading >= 0 && aircraftMarkerHeading >= 0) ||
-                (aircraftHeading <= 0 && aircraftMarkerHeading <= 0)) && map != null) {
-            animateAircraftHeading(aircraftMarkerHeading,
-                    aircraftHeading - map.getCameraPosition().bearing,
-                    aircraftHeading);
-        } else {
-            setAircraftHeading(aircraftHeading);
+        if (map == null) return;
+        float targetRotation = toMapRelativeRotation(aircraftHeading);
+        if (aircraftMarker == null) {
+            aircraftMarkerHeading = targetRotation;
+            return;
         }
+        animateAircraftHeading(aircraftMarkerHeading, targetRotation);
     }
 
     /**
@@ -571,10 +571,11 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
      */
     private void setAircraftHeading(float aircraftHeading) {
         if (map == null) return;
+        float targetRotation = toMapRelativeRotation(aircraftHeading);
         if (aircraftMarker != null) {
-            rotateAircraftMarker(aircraftHeading - map.getCameraPosition().bearing);
+            rotateAircraftMarker(targetRotation);
         }
-        aircraftMarkerHeading = aircraftHeading - map.getCameraPosition().bearing;
+        aircraftMarkerHeading = targetRotation;
     }
 
     /**
@@ -583,28 +584,43 @@ public class MapWidget extends ConstraintLayoutWidget<Object> implements View.On
     private void setGimbalHeading(float aircraftHeading, float gimbalHeading) {
         if (map == null) return;
         if (gimbalYawMarker != null) {
-            rotateGimbalMarker(gimbalHeading + aircraftHeading - map.getCameraPosition().bearing);
+            rotateGimbalMarker(toMapRelativeRotation(aircraftHeading + gimbalHeading));
         }
     }
 
     /**
      * Animates the rotation of the aircraft
      */
-    private void animateAircraftHeading(final float fromPosition, final float toPosition, float aircraftHeading) {
+    private void animateAircraftHeading(final float fromPosition, final float toPosition) {
         if (map == null || aircraftMarker == null) return;
 
-        //rotation animation
-        ValueAnimator rotateAnimation =
-                ValueAnimator.ofFloat(aircraftMarkerHeading, aircraftHeading - map.getCameraPosition().bearing);
+        float shortestDelta = normalizeMarkerRotation(toPosition - fromPosition);
+        ValueAnimator rotateAnimation = ValueAnimator.ofFloat(fromPosition, fromPosition + shortestDelta);
         rotateAnimation.setDuration(ROTATION_ANIM_DURATION);
         rotateAnimation.setInterpolator(new LinearInterpolator());
         rotateAnimation.addUpdateListener(valueAnimator -> {
-            float progress = valueAnimator.getAnimatedFraction();
-            float rotation = (toPosition - fromPosition) * progress + fromPosition;
-            rotateAircraftMarker(rotation);
+            float rotation = (float) valueAnimator.getAnimatedValue();
+            rotateAircraftMarker(normalizeMarkerRotation(rotation));
         });
         rotateAnimation.start();
-        aircraftMarkerHeading = aircraftHeading - map.getCameraPosition().bearing;
+        aircraftMarkerHeading = normalizeMarkerRotation(toPosition);
+    }
+
+    private float toMapRelativeRotation(float heading) {
+        if (map == null) {
+            return normalizeMarkerRotation(heading);
+        }
+        return normalizeMarkerRotation(heading - map.getCameraPosition().bearing);
+    }
+
+    private float normalizeMarkerRotation(float rotation) {
+        float normalizedRotation = rotation % 360f;
+        if (normalizedRotation > 180f) {
+            normalizedRotation -= 360f;
+        } else if (normalizedRotation <= -180f) {
+            normalizedRotation += 360f;
+        }
+        return normalizedRotation;
     }
 
     /**

@@ -4,7 +4,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -37,6 +36,7 @@ public class LiveForwardFragment extends MenuFragment {
 
     private static final String TAG = "LiveForwardFragment";
     private static final String PREF_RTMP_URL = "uxsdk-live-forward-rtmp-url";
+    private static final ComponentIndexType LIVE_FORWARD_CAMERA_INDEX = ComponentIndexType.FPV;
     private static final int MIN_VIDEO_BITRATE = 2 * 1024 * 1024;
     private static final int MAX_VIDEO_BITRATE = 16 * 1024 * 1024;
     private static final int DEFAULT_VIDEO_BITRATE_PROGRESS = 20;
@@ -53,6 +53,7 @@ public class LiveForwardFragment extends MenuFragment {
     private Button btnStart;
     private Button btnStop;
     private boolean isBindingUiState;
+    private boolean isFpvSourceAvailable = true;
 
     private final LiveStreamStatusListener liveStreamStatusListener = new LiveStreamStatusListener() {
         @Override
@@ -115,6 +116,10 @@ public class LiveForwardFragment extends MenuFragment {
         streamManager = MediaDataCenter.getInstance().getLiveStreamManager();
         cameraStreamManager = MediaDataCenter.getInstance().getCameraStreamManager();
         initViews(mFragmentRoot);
+        enforceFpvOnlyCameraSelection();
+        if (streamManager != null) {
+            streamManager.setCameraIndex(LIVE_FORWARD_CAMERA_INDEX);
+        }
         setupSelections();
         setupButtons();
         populateInputFields();
@@ -139,6 +144,27 @@ public class LiveForwardFragment extends MenuFragment {
         sbBitrate = view.findViewById(R.id.sb_live_forward_bitrate);
         btnStart = view.findViewById(R.id.btn_live_forward_start);
         btnStop = view.findViewById(R.id.btn_live_forward_stop);
+    }
+
+    private void enforceFpvOnlyCameraSelection() {
+        if (mFragmentRoot == null) {
+            return;
+        }
+        View leftCameraButton = mFragmentRoot.findViewById(R.id.rb_live_forward_camera_left);
+        if (leftCameraButton != null) {
+            leftCameraButton.setVisibility(View.GONE);
+        }
+        View rightCameraButton = mFragmentRoot.findViewById(R.id.rb_live_forward_camera_right);
+        if (rightCameraButton != null) {
+            rightCameraButton.setVisibility(View.GONE);
+        }
+        View fpvCameraButton = mFragmentRoot.findViewById(R.id.rb_live_forward_camera_fpv);
+        if (fpvCameraButton != null) {
+            fpvCameraButton.setVisibility(View.VISIBLE);
+        }
+        if (rgCamera != null && rgCamera.getCheckedRadioButtonId() != R.id.rb_live_forward_camera_fpv) {
+            rgCamera.check(R.id.rb_live_forward_camera_fpv);
+        }
     }
 
     private void setupSelections() {
@@ -364,10 +390,7 @@ public class LiveForwardFragment extends MenuFragment {
     }
 
     private ComponentIndexType getSafeCameraIndex() {
-        if (streamManager == null || streamManager.getCameraIndex() == null) {
-            return ComponentIndexType.LEFT_OR_MAIN;
-        }
-        return streamManager.getCameraIndex();
+        return LIVE_FORWARD_CAMERA_INDEX;
     }
 
     private StreamQuality getSafeStreamQuality() {
@@ -388,14 +411,8 @@ public class LiveForwardFragment extends MenuFragment {
         if (rgCamera == null) {
             return;
         }
-        int targetId = R.id.rb_live_forward_camera_left;
-        if (cameraIndex == ComponentIndexType.RIGHT) {
-            targetId = R.id.rb_live_forward_camera_right;
-        } else if (cameraIndex == ComponentIndexType.FPV) {
-            targetId = R.id.rb_live_forward_camera_fpv;
-        }
-        if (rgCamera.getCheckedRadioButtonId() != targetId) {
-            rgCamera.check(targetId);
+        if (rgCamera.getCheckedRadioButtonId() != R.id.rb_live_forward_camera_fpv) {
+            rgCamera.check(R.id.rb_live_forward_camera_fpv);
         }
     }
 
@@ -417,18 +434,7 @@ public class LiveForwardFragment extends MenuFragment {
     }
 
     private ComponentIndexType getSelectedCameraIndex() {
-        if (rgCamera == null) {
-            return ComponentIndexType.LEFT_OR_MAIN;
-        }
-        RadioButton selectedButton = mFragmentRoot.findViewById(rgCamera.getCheckedRadioButtonId());
-        if (selectedButton == null || selectedButton.getTag() == null) {
-            return ComponentIndexType.LEFT_OR_MAIN;
-        }
-        try {
-            return ComponentIndexType.find(Integer.parseInt(String.valueOf(selectedButton.getTag())));
-        } catch (NumberFormatException e) {
-            return ComponentIndexType.LEFT_OR_MAIN;
-        }
+        return LIVE_FORWARD_CAMERA_INDEX;
     }
 
     private StreamQuality getSelectedQuality() {
@@ -515,36 +521,21 @@ public class LiveForwardFragment extends MenuFragment {
     }
 
     private void updateAvailableCameraList(List<ComponentIndexType> cameraList) {
-        if (rgCamera == null || cameraList == null || cameraList.isEmpty()) {
-            return;
-        }
+        isFpvSourceAvailable = cameraList != null && cameraList.contains(LIVE_FORWARD_CAMERA_INDEX);
+        enforceFpvOnlyCameraSelection();
 
-        View firstVisibleView = null;
-        boolean checkedCameraHidden = false;
-        for (int i = 0; i < rgCamera.getChildCount(); i++) {
-            View child = rgCamera.getChildAt(i);
-            ComponentIndexType cameraIndex = ComponentIndexType.UNKNOWN;
-            Object tag = child.getTag();
-            if (tag != null) {
-                try {
-                    cameraIndex = ComponentIndexType.find(Integer.parseInt(String.valueOf(tag)));
-                } catch (NumberFormatException ignored) {
-                    cameraIndex = ComponentIndexType.UNKNOWN;
-                }
-            }
-            boolean visible = cameraList.contains(cameraIndex);
-            child.setVisibility(visible ? View.VISIBLE : View.GONE);
-            if (visible && firstVisibleView == null) {
-                firstVisibleView = child;
-            }
-            if (!visible && rgCamera.getCheckedRadioButtonId() == child.getId()) {
-                checkedCameraHidden = true;
+        if (mFragmentRoot != null) {
+            View fpvCameraButton = mFragmentRoot.findViewById(R.id.rb_live_forward_camera_fpv);
+            if (fpvCameraButton != null) {
+                fpvCameraButton.setEnabled(isFpvSourceAvailable);
+                fpvCameraButton.setAlpha(isFpvSourceAvailable ? 1f : 0.5f);
             }
         }
 
-        if (checkedCameraHidden && firstVisibleView != null) {
-            rgCamera.check(firstVisibleView.getId());
+        if (streamManager != null && isFpvSourceAvailable) {
+            streamManager.setCameraIndex(LIVE_FORWARD_CAMERA_INDEX);
         }
+        updateButtonStates(streamManager != null && streamManager.isStreaming());
     }
 
     private void clearInputErrors() {
@@ -553,7 +544,7 @@ public class LiveForwardFragment extends MenuFragment {
 
     private void updateButtonStates(boolean streaming) {
         if (btnStart != null) {
-            btnStart.setEnabled(!streaming);
+            btnStart.setEnabled(!streaming && isFpvSourceAvailable);
         }
         if (btnStop != null) {
             btnStop.setEnabled(streaming);
